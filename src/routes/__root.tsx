@@ -77,15 +77,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Orion Store — Tecnologia, wearables e calçados" },
+      {
+        name: "description",
+        content:
+          "Loja online Orion: áudio, wearables, calçados e acessórios com frete grátis acima de R$ 299 e parcelamento em 10x.",
+      },
+      { name: "author", content: "Orion Store" },
+      { property: "og:title", content: "Orion Store — Tecnologia e design para o dia a dia" },
+      {
+        property: "og:description",
+        content: "Ofertas em áudio, wearables, calçados e acessórios com entrega para todo o Brasil.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
+
     links: [
       {
         rel: "stylesheet",
