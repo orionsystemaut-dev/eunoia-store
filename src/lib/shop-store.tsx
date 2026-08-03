@@ -24,6 +24,18 @@ export type CartItem = {
   qty: number;
 };
 
+export type SiteConfig = {
+  heroTag: string;
+  heroTitle: string;
+  heroSubtitle: string;
+};
+
+const DEFAULT_SITE_CONFIG: SiteConfig = {
+  heroTag: "Semana Orion · até 35% OFF",
+  heroTitle: "Tecnologia que combina com o seu ritmo.",
+  heroSubtitle: "Curadoria de áudio, wearables e calçados com garantia estendida, entrega rastreada e parcelamento em até 10x sem juros.",
+};
+
 type ShopState = {
   products: Product[];
   orders: Order[];
@@ -43,19 +55,22 @@ type ShopState = {
   isAdmin: boolean;
   login: (user: string, pass: string) => boolean;
   logout: () => void;
+  siteConfig: SiteConfig;
+  updateSiteConfig: (config: SiteConfig) => void;
 };
 
 const ShopContext = createContext<ShopState | null>(null);
 
 const KEY = "orion-shop-v1";
 
-type Persisted = { products: Product[]; orders: Order[]; cart: CartItem[]; isAdmin: boolean };
+type Persisted = { products: Product[]; orders: Order[]; cart: CartItem[]; isAdmin: boolean; siteConfig: SiteConfig };
 
 export function ShopProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>(SEED_PRODUCTS);
   const [orders, setOrders] = useState<Order[]>(SEED_ORDERS);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [siteConfig, setSiteConfig] = useState<SiteConfig>(DEFAULT_SITE_CONFIG);
   const [cartOpen, setCartOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
@@ -67,6 +82,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         if (parsed.products?.length) setProducts(parsed.products);
         if (parsed.orders?.length) setOrders(parsed.orders);
         if (parsed.cart) setCart(parsed.cart);
+        if (parsed.siteConfig) setSiteConfig(parsed.siteConfig);
         setIsAdmin(Boolean(parsed.isAdmin));
       }
     } catch {
@@ -77,8 +93,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem(KEY, JSON.stringify({ products, orders, cart, isAdmin }));
-  }, [products, orders, cart, isAdmin, hydrated]);
+    localStorage.setItem(KEY, JSON.stringify({ products, orders, cart, isAdmin, siteConfig }));
+  }, [products, orders, cart, isAdmin, siteConfig, hydrated]);
 
   const addToCart = useCallback((product: Product, variant: string, qty: number) => {
     setCart((prev) => {
@@ -167,6 +183,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         return ok;
       },
       logout: () => setIsAdmin(false),
+      siteConfig,
+      updateSiteConfig: setSiteConfig,
     }),
     [
       products,
@@ -180,6 +198,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       removeFromCart,
       placeOrder,
       isAdmin,
+      siteConfig,
     ],
   );
 

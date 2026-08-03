@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { LayoutDashboard, LogOut, Package, ReceiptText, Store } from "lucide-react";
+import { LayoutDashboard, LogOut, Package, ReceiptText, Store, CreditCard, MonitorPlay } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useShop } from "@/lib/shop-store";
@@ -9,6 +9,8 @@ const nav = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/produtos", label: "Produtos", icon: Package },
   { to: "/admin/pedidos", label: "Pedidos", icon: ReceiptText },
+  { to: "/admin/pagamentos", label: "Pagamentos", icon: CreditCard },
+  { to: "/admin/editor", label: "Editor do Site", icon: MonitorPlay },
 ] as const;
 
 export function AdminShell({ title, children }: { title: string; children: ReactNode }) {

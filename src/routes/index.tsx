@@ -35,7 +35,7 @@ const perks = [
 ];
 
 function Home() {
-  const { products } = useShop();
+  const { products, siteConfig } = useShop();
   const featured = products.filter((p) => p.featured).slice(0, 4);
   const news = products.filter((p) => p.isNew).slice(0, 4);
 
@@ -45,14 +45,13 @@ function Home() {
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-12 lg:grid-cols-2 lg:px-8 lg:py-20">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">
-              Semana Orion · até 35% OFF
+              {siteConfig.heroTag}
             </span>
             <h1 className="mt-5 font-display text-4xl font-bold leading-[1.05] sm:text-5xl lg:text-6xl">
-              Tecnologia que combina com o seu ritmo.
+              {siteConfig.heroTitle}
             </h1>
             <p className="mt-4 max-w-md text-base text-muted-foreground">
-              Curadoria de áudio, wearables e calçados com garantia estendida, entrega rastreada e
-              parcelamento em até 10x sem juros.
+              {siteConfig.heroSubtitle}
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link to="/catalogo" search={{ q: "", categoria: "todas", ordem: "relevancia" }}>

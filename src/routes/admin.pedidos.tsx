@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { useState } from "react";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -39,6 +41,14 @@ const statusTone: Record<OrderStatus, string> = {
 
 function AdminOrders() {
   const { orders, updateOrderStatus } = useShop();
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | "Todos">("Todos");
+
+  const filteredOrders = orders.filter((o) => {
+    const matchesSearch = o.id.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = statusFilter === "Todos" || o.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <AdminShell title="Pedidos">
@@ -51,6 +61,28 @@ function AdminOrders() {
             </p>
           </div>
         ))}
+      </div>
+
+      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <Input
+          placeholder="Buscar por código (ex: #10432)..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-xs bg-card"
+        />
+        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+          <SelectTrigger className="w-[190px] bg-card">
+            <SelectValue placeholder="Filtrar por status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Todos">Todos os Status</SelectItem>
+            {ORDER_STATUSES.map((s) => (
+              <SelectItem key={s} value={s}>
+                {s}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="mt-5 overflow-x-auto rounded-2xl border border-border bg-card">
@@ -66,8 +98,15 @@ function AdminOrders() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {orders.map((o) => (
-              <tr key={o.id}>
+            {filteredOrders.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                  Nenhum pedido encontrado.
+                </td>
+              </tr>
+            ) : (
+              filteredOrders.map((o) => (
+                <tr key={o.id}>
                 <td className="px-4 py-3 font-medium">{o.id}</td>
                 <td className="px-4 py-3">{o.customer}</td>
                 <td className="px-4 py-3 text-muted-foreground">{o.date}</td>
@@ -98,8 +137,9 @@ function AdminOrders() {
                     </Select>
                   </div>
                 </td>
-              </tr>
-            ))}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
