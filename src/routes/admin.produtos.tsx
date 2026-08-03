@@ -84,6 +84,7 @@ function AdminProducts() {
     }
     const existing = products.find((p) => p.id === form.id);
     saveProduct({
+      ...(existing ?? {}),
       id: form.id || `p-${Date.now()}`,
       name: form.name.trim(),
       price,
@@ -94,10 +95,8 @@ function AdminProducts() {
       variants: existing?.variants ?? ["Único"],
       rating: existing?.rating ?? 4.5,
       isNew: existing?.isNew ?? !form.id,
-      featured: existing?.featured,
-      oldPrice: existing?.oldPrice,
-      gallery: existing?.gallery,
     });
+
     toast.success(form.id ? "Produto atualizado" : "Produto cadastrado");
     setOpen(false);
   };
