@@ -23,6 +23,7 @@ function AdminEditor() {
   const { siteConfig, updateSiteConfig } = useShop();
   
   const [config, setConfig] = useState<SiteConfig>(siteConfig);
+  const [activeTab, setActiveTab] = useState("hero");
 
   const handleSave = () => {
     updateSiteConfig(config);
@@ -39,7 +40,7 @@ function AdminEditor() {
     <AdminShell title="Editor do Site">
       <div className="grid lg:grid-cols-2 gap-8">
         <div className="space-y-6">
-          <Tabs defaultValue="hero" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="w-full grid grid-cols-4">
               <TabsTrigger value="hero">Hero</TabsTrigger>
               <TabsTrigger value="sections">Seções</TabsTrigger>
@@ -143,18 +144,61 @@ function AdminEditor() {
 
         <div className="rounded-3xl border border-border bg-surface overflow-hidden hidden lg:flex flex-col relative h-[600px] sticky top-6">
           <div className="bg-muted p-2 flex gap-1 items-center justify-center border-b border-border text-xs text-muted-foreground font-mono">
-            Preview do Hero (Em tempo real)
+            Preview em tempo real
           </div>
           <div className="flex-1 p-6 flex flex-col justify-center items-center text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">
-              {config.heroTag}
-            </span>
-            <h1 className="mt-5 font-display text-2xl font-bold leading-tight">
-              {config.heroTitle}
-            </h1>
-            <p className="mt-4 max-w-sm text-sm text-muted-foreground">
-              {config.heroSubtitle}
-            </p>
+            {activeTab === "hero" && (
+              <>
+                <span className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">
+                  {config.heroTag}
+                </span>
+                <h1 className="mt-5 font-display text-2xl font-bold leading-tight">
+                  {config.heroTitle}
+                </h1>
+                <p className="mt-4 max-w-sm text-sm text-muted-foreground">
+                  {config.heroSubtitle}
+                </p>
+              </>
+            )}
+
+            {activeTab === "sections" && (
+              <div className="space-y-8 w-full text-left">
+                <div>
+                  <h2 className="font-display text-xl font-bold">{config.featuredTitle}</h2>
+                  <p className="text-sm text-muted-foreground">{config.featuredSubtitle}</p>
+                </div>
+                <div>
+                  <h2 className="font-display text-xl font-bold">{config.categoriesTitle}</h2>
+                </div>
+                <div>
+                  <h2 className="font-display text-xl font-bold">{config.newTitle}</h2>
+                  <p className="text-sm text-muted-foreground">{config.newSubtitle}</p>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "perks" && (
+              <div className="w-full grid grid-cols-2 gap-4 text-left">
+                {config.perks.map((p, i) => (
+                  <div key={i} className="rounded-xl border border-border bg-card p-3">
+                    <p className="text-sm font-semibold">{p.title}</p>
+                    <p className="text-xs text-muted-foreground">{p.text}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {activeTab === "global" && (
+              <div className="w-full space-y-12 flex flex-col justify-between h-full">
+                <div className="border border-brand text-brand p-2 rounded-lg text-xs font-medium text-center">
+                  Promo Bar: {config.promoBar}
+                </div>
+                <div className="border border-border p-4 rounded-lg bg-card text-left mt-auto">
+                  <p className="font-display font-bold">Orion.</p>
+                  <p className="text-xs text-muted-foreground mt-2">{config.footerDescription}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
