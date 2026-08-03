@@ -24,16 +24,42 @@ export type CartItem = {
   qty: number;
 };
 
+export type PerkConfig = {
+  title: string;
+  text: string;
+};
+
 export type SiteConfig = {
+  promoBar: string;
   heroTag: string;
   heroTitle: string;
   heroSubtitle: string;
+  perks: PerkConfig[];
+  featuredTitle: string;
+  featuredSubtitle: string;
+  categoriesTitle: string;
+  newTitle: string;
+  newSubtitle: string;
+  footerDescription: string;
 };
 
 const DEFAULT_SITE_CONFIG: SiteConfig = {
+  promoBar: "Frete grátis acima de R$ 299",
   heroTag: "Semana Orion · até 35% OFF",
   heroTitle: "Tecnologia que combina com o seu ritmo.",
   heroSubtitle: "Curadoria de áudio, wearables e calçados com garantia estendida, entrega rastreada e parcelamento em até 10x sem juros.",
+  perks: [
+    { title: "Frete grátis", text: "Acima de R$ 299 para todo o Brasil" },
+    { title: "30 dias", text: "Troca fácil e devolução sem custo" },
+    { title: "10x sem juros", text: "Ou 12% off no Pix à vista" },
+    { title: "Suporte real", text: "Atendimento humano todos os dias" },
+  ],
+  featuredTitle: "Destaques da semana",
+  featuredSubtitle: "Os produtos mais desejados pelos nossos clientes",
+  categoriesTitle: "Navegue por categoria",
+  newTitle: "Lançamentos",
+  newSubtitle: "Recém-chegados na loja, com estoque limitado",
+  footerDescription: "Tecnologia e design para o dia a dia. Curadoria de produtos com garantia estendida e entrega para todo o Brasil.",
 };
 
 type ShopState = {

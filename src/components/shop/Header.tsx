@@ -9,7 +9,7 @@ import { CATEGORIES } from "@/lib/shop-data";
 import { useShop } from "@/lib/shop-store";
 
 export function Header() {
-  const { cartCount, setCartOpen, isAdmin } = useShop();
+  const { cartCount, setCartOpen, isAdmin, siteConfig } = useShop();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -120,7 +120,7 @@ export function Header() {
             </Link>
           ))}
           <span className="ml-auto text-xs font-medium text-brand">
-            Frete grátis acima de R$ 299
+            {siteConfig.promoBar}
           </span>
         </div>
       </nav>

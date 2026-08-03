@@ -3,7 +3,10 @@ import { CreditCard, Lock, ShieldCheck, Truck } from "lucide-react";
 
 import { CATEGORIES } from "@/lib/shop-data";
 
+import { useShop } from "@/lib/shop-store";
+
 export function Footer() {
+  const { siteConfig } = useShop();
   return (
     <footer className="mt-20 border-t border-border bg-surface">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
@@ -12,8 +15,7 @@ export function Footer() {
             Orion<span className="text-brand">.</span>
           </p>
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-            Tecnologia e design para o dia a dia. Curadoria de produtos com garantia estendida e
-            entrega para todo o Brasil.
+            {siteConfig.footerDescription}
           </p>
         </div>
         <div>

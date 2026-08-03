@@ -27,12 +27,6 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const perks = [
-  { icon: Truck, title: "Frete grátis", text: "Acima de R$ 299 para todo o Brasil" },
-  { icon: RefreshCcw, title: "30 dias", text: "Troca fácil e devolução sem custo" },
-  { icon: BadgePercent, title: "10x sem juros", text: "Ou 12% off no Pix à vista" },
-  { icon: Headphones, title: "Suporte real", text: "Atendimento humano todos os dias" },
-];
 
 function Home() {
   const { products, siteConfig } = useShop();
@@ -79,28 +73,31 @@ function Home() {
       </section>
 
       <section className="mx-auto grid max-w-7xl gap-4 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
-        {perks.map((p) => (
-          <div
-            key={p.title}
-            className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4"
-          >
-            <p.icon className="h-5 w-5 shrink-0 text-brand" />
-            <div className="min-w-0">
-              <p className="text-sm font-semibold">{p.title}</p>
-              <p className="text-xs text-muted-foreground">{p.text}</p>
+        {siteConfig.perks.map((p, i) => {
+          const Icon = [Truck, RefreshCcw, BadgePercent, Headphones][i];
+          return (
+            <div
+              key={p.title + i}
+              className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4"
+            >
+              {Icon && <Icon className="h-5 w-5 shrink-0 text-brand" />}
+              <div className="min-w-0">
+                <p className="text-sm font-semibold">{p.title}</p>
+                <p className="text-xs text-muted-foreground">{p.text}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </section>
 
       <Section
-        title="Destaques da semana"
-        subtitle="Os produtos mais desejados pelos nossos clientes"
+        title={siteConfig.featuredTitle}
+        subtitle={siteConfig.featuredSubtitle}
         items={featured}
       />
 
       <section className="mx-auto max-w-7xl px-4 py-6 lg:px-8">
-        <h2 className="font-display text-2xl font-bold sm:text-3xl">Navegue por categoria</h2>
+        <h2 className="font-display text-2xl font-bold sm:text-3xl">{siteConfig.categoriesTitle}</h2>
         <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {CATEGORIES.map((c) => (
             <Link
@@ -120,8 +117,8 @@ function Home() {
       </section>
 
       <Section
-        title="Lançamentos"
-        subtitle="Recém-chegados na loja, com estoque limitado"
+        title={siteConfig.newTitle}
+        subtitle={siteConfig.newSubtitle}
         items={news}
       />
     </StoreShell>
