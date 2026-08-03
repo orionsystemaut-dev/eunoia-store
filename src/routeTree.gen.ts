@@ -10,33 +10,135 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as CatalogoRouteImport } from './routes/catalogo'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminPedidosRouteImport } from './routes/admin.pedidos'
+import { Route as AdminProdutosRouteImport } from './routes/admin.produtos'
+import { Route as ProdutoIdRouteImport } from './routes/produto.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatalogoRoute = CatalogoRouteImport.update({
+  id: '/catalogo',
+  path: '/catalogo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPedidosRoute = AdminPedidosRouteImport.update({
+  id: '/pedidos',
+  path: '/pedidos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProdutosRoute = AdminProdutosRouteImport.update({
+  id: '/produtos',
+  path: '/produtos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const ProdutoIdRoute = ProdutoIdRouteImport.update({
+  id: '/produto/$id',
+  path: '/produto/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/catalogo': typeof CatalogoRoute
+  '/checkout': typeof CheckoutRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/pedidos': typeof AdminPedidosRoute
+  '/admin/produtos': typeof AdminProdutosRoute
+  '/produto/$id': typeof ProdutoIdRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/catalogo': typeof CatalogoRoute
+  '/checkout': typeof CheckoutRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/pedidos': typeof AdminPedidosRoute
+  '/admin/produtos': typeof AdminProdutosRoute
+  '/produto/$id': typeof ProdutoIdRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/catalogo': typeof CatalogoRoute
+  '/checkout': typeof CheckoutRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/pedidos': typeof AdminPedidosRoute
+  '/admin/produtos': typeof AdminProdutosRoute
+  '/produto/$id': typeof ProdutoIdRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/catalogo'
+    | '/checkout'
+    | '/admin/dashboard'
+    | '/admin/pedidos'
+    | '/admin/produtos'
+    | '/produto/$id'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/catalogo'
+    | '/checkout'
+    | '/admin/dashboard'
+    | '/admin/pedidos'
+    | '/admin/produtos'
+    | '/produto/$id'
+    | '/admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/catalogo'
+    | '/checkout'
+    | '/admin/dashboard'
+    | '/admin/pedidos'
+    | '/admin/produtos'
+    | '/produto/$id'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  CatalogoRoute: typeof CatalogoRoute
+  CheckoutRoute: typeof CheckoutRoute
+  ProdutoIdRoute: typeof ProdutoIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +150,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catalogo': {
+      id: '/catalogo'
+      path: '/catalogo'
+      fullPath: '/catalogo'
+      preLoaderRoute: typeof CatalogoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/pedidos': {
+      id: '/admin/pedidos'
+      path: '/pedidos'
+      fullPath: '/admin/pedidos'
+      preLoaderRoute: typeof AdminPedidosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/produtos': {
+      id: '/admin/produtos'
+      path: '/produtos'
+      fullPath: '/admin/produtos'
+      preLoaderRoute: typeof AdminProdutosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/produto/$id': {
+      id: '/produto/$id'
+      path: '/produto/$id'
+      fullPath: '/produto/$id'
+      preLoaderRoute: typeof ProdutoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminPedidosRoute: typeof AdminPedidosRoute
+  AdminProdutosRoute: typeof AdminProdutosRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminPedidosRoute: AdminPedidosRoute,
+  AdminProdutosRoute: AdminProdutosRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  CatalogoRoute: CatalogoRoute,
+  CheckoutRoute: CheckoutRoute,
+  ProdutoIdRoute: ProdutoIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
