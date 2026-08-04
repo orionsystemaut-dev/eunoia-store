@@ -10,6 +10,8 @@ import {
 import {
   SEED_ORDERS,
   SEED_PRODUCTS,
+  type Customer,
+  type Invoice,
   type Order,
   type OrderStatus,
   type Product,
@@ -47,7 +49,8 @@ const DEFAULT_SITE_CONFIG: SiteConfig = {
   promoBar: "Frete grátis acima de R$ 299",
   heroTag: "Semana Orion · até 35% OFF",
   heroTitle: "Tecnologia que combina com o seu ritmo.",
-  heroSubtitle: "Curadoria de áudio, wearables e calçados com garantia estendida, entrega rastreada e parcelamento em até 10x sem juros.",
+  heroSubtitle:
+    "Curadoria de áudio, wearables e calçados com garantia estendida, entrega rastreada e parcelamento em até 10x sem juros.",
   perks: [
     { title: "Frete grátis", text: "Acima de R$ 299 para todo o Brasil" },
     { title: "30 dias", text: "Troca fácil e devolução sem custo" },
@@ -59,7 +62,32 @@ const DEFAULT_SITE_CONFIG: SiteConfig = {
   categoriesTitle: "Navegue por categoria",
   newTitle: "Lançamentos",
   newSubtitle: "Recém-chegados na loja, com estoque limitado",
-  footerDescription: "Tecnologia e design para o dia a dia. Curadoria de produtos com garantia estendida e entrega para todo o Brasil.",
+  footerDescription:
+    "Tecnologia e design para o dia a dia. Curadoria de produtos com garantia estendida e entrega para todo o Brasil.",
+};
+
+export type PlaceOrderInput = {
+  name: string;
+  email: string;
+  doc: string;
+  phone: string;
+  cep: string;
+  address: string;
+  payment: string;
+  subtotal: number;
+  shipping: number;
+  discount: number;
+  total: number;
+};
+
+export type RegisterInput = {
+  name: string;
+  email: string;
+  password: string;
+  doc: string;
+  phone: string;
+  cep: string;
+  address: string;
 };
 
 type ShopState = {
@@ -74,13 +102,22 @@ type ShopState = {
   updateQty: (productId: string, variant: string, qty: number) => void;
   removeFromCart: (productId: string, variant: string) => void;
   clearCart: () => void;
-  placeOrder: (customer: string) => Order;
+  placeOrder: (input: PlaceOrderInput) => Order;
   saveProduct: (product: Product) => void;
   deleteProduct: (id: string) => void;
   updateOrderStatus: (id: string, status: OrderStatus) => void;
+  confirmPayment: (id: string) => void;
+  confirmValue: (id: string) => void;
+  adjustOrderTotal: (id: string, total: number, reason: string) => void;
+  issueInvoice: (id: string) => void;
   isAdmin: boolean;
   login: (user: string, pass: string) => boolean;
   logout: () => void;
+  customers: Customer[];
+  customer: Customer | null;
+  registerCustomer: (input: RegisterInput) => { ok: boolean; error?: string };
+  loginCustomer: (email: string, password: string) => { ok: boolean; error?: string };
+  logoutCustomer: () => void;
   siteConfig: SiteConfig;
   updateSiteConfig: (config: SiteConfig) => void;
 };
@@ -89,13 +126,25 @@ const ShopContext = createContext<ShopState | null>(null);
 
 const KEY = "orion-shop-v1";
 
-type Persisted = { products: Product[]; orders: Order[]; cart: CartItem[]; isAdmin: boolean; siteConfig: SiteConfig };
+type Persisted = {
+  products: Product[];
+  orders: Order[];
+  cart: CartItem[];
+  isAdmin: boolean;
+  siteConfig: SiteConfig;
+  customers: Customer[];
+  customerId: string | null;
+};
+
+const now = () => new Date().toISOString();
 
 export function ShopProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>(SEED_PRODUCTS);
   const [orders, setOrders] = useState<Order[]>(SEED_ORDERS);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customerId, setCustomerId] = useState<string | null>(null);
   const [siteConfig, setSiteConfig] = useState<SiteConfig>(DEFAULT_SITE_CONFIG);
   const [cartOpen, setCartOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -108,6 +157,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         if (parsed.products?.length) setProducts(parsed.products);
         if (parsed.orders?.length) setOrders(parsed.orders);
         if (parsed.cart) setCart(parsed.cart);
+        if (parsed.customers) setCustomers(parsed.customers);
+        if (parsed.customerId) setCustomerId(parsed.customerId);
         if (parsed.siteConfig)
           setSiteConfig({
             ...DEFAULT_SITE_CONFIG,
@@ -126,16 +177,17 @@ export function ShopProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem(KEY, JSON.stringify({ products, orders, cart, isAdmin, siteConfig }));
-  }, [products, orders, cart, isAdmin, siteConfig, hydrated]);
+    localStorage.setItem(
+      KEY,
+      JSON.stringify({ products, orders, cart, isAdmin, siteConfig, customers, customerId }),
+    );
+  }, [products, orders, cart, isAdmin, siteConfig, customers, customerId, hydrated]);
 
   const addToCart = useCallback((product: Product, variant: string, qty: number) => {
     setCart((prev) => {
       const found = prev.find((i) => i.productId === product.id && i.variant === variant);
       if (found) {
-        return prev.map((i) =>
-          i === found ? { ...i, qty: Math.min(i.qty + qty, 99) } : i,
-        );
+        return prev.map((i) => (i === found ? { ...i, qty: Math.min(i.qty + qty, 99) } : i));
       }
       return [
         ...prev,
@@ -170,24 +222,55 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const cartTotal = cart.reduce((s, i) => s + i.qty * i.price, 0);
 
   const placeOrder = useCallback(
-    (customer: string) => {
+    (input: PlaceOrderInput) => {
       const order: Order = {
         id: `#${10437 + orders.length}`,
-        customer: customer || "Cliente Loja",
+        customer: input.name || "Cliente Loja",
         date: new Date().toISOString().slice(0, 10),
-        total: cartTotal,
+        total: input.total,
         items: cartCount,
         status: "Aguardando Pagamento",
+        email: input.email,
+        doc: input.doc,
+        phone: input.phone,
+        cep: input.cep,
+        address: input.address,
+        payment: input.payment,
+        subtotal: input.subtotal,
+        shipping: input.shipping,
+        discount: input.discount,
+        lines: cart.map((i) => ({
+          productId: i.productId,
+          name: i.name,
+          variant: i.variant,
+          qty: i.qty,
+          price: i.price,
+        })),
+        paymentConfirmed: false,
+        valueConfirmed: false,
+        invoice: null,
+        history: [{ at: now(), label: "Pedido recebido pela loja" }],
       };
       setOrders((prev) => [order, ...prev]);
       setCart([]);
       return order;
     },
-    [orders.length, cartTotal, cartCount],
+    [orders.length, cart, cartCount],
   );
 
-  const value = useMemo<ShopState>(
-    () => ({
+  const pushEvent = useCallback((id: string, label: string, patch: Partial<Order> = {}) => {
+    setOrders((prev) =>
+      prev.map((o) =>
+        o.id === id
+          ? { ...o, ...patch, history: [...(o.history ?? []), { at: now(), label }] }
+          : o,
+      ),
+    );
+  }, []);
+
+  const value = useMemo<ShopState>(() => {
+    const customer = customers.find((c) => c.id === customerId) ?? null;
+    return {
       products,
       orders,
       cart,
@@ -207,8 +290,31 @@ export function ShopProvider({ children }: { children: ReactNode }) {
             : [product, ...prev],
         ),
       deleteProduct: (id) => setProducts((prev) => prev.filter((p) => p.id !== id)),
-      updateOrderStatus: (id, status) =>
-        setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o))),
+      updateOrderStatus: (id, status) => pushEvent(id, `Status alterado para "${status}"`, { status }),
+      confirmPayment: (id) =>
+        pushEvent(id, "Pagamento confirmado pelo gestor", {
+          paymentConfirmed: true,
+          status: "Pagamento Confirmado",
+        }),
+      confirmValue: (id) => pushEvent(id, "Valor do pedido conferido e aprovado", { valueConfirmed: true }),
+      adjustOrderTotal: (id, total, reason) =>
+        pushEvent(id, `Valor ajustado para R$ ${total.toFixed(2)} — ${reason || "sem observação"}`, {
+          total,
+          valueConfirmed: true,
+        }),
+      issueInvoice: (id) => {
+        const order = orders.find((o) => o.id === id);
+        if (!order) return;
+        const seq = String(1000 + orders.filter((o) => o.invoice).length + 1);
+        const invoice: Invoice = {
+          number: seq,
+          series: "001",
+          issuedAt: now(),
+          key: Array.from({ length: 44 }, (_, i) => ((id.charCodeAt(i % id.length) + i * 7) % 10)).join(""),
+          taxes: Number((order.total * 0.12).toFixed(2)),
+        };
+        pushEvent(id, `Nota fiscal ${seq} emitida`, { invoice });
+      },
       isAdmin,
       login: (user, pass) => {
         const ok = user.trim().toUpperCase() === "ORION" && pass === "ORION2027";
@@ -216,24 +322,51 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         return ok;
       },
       logout: () => setIsAdmin(false),
+      customers,
+      customer,
+      registerCustomer: (input) => {
+        const email = input.email.trim().toLowerCase();
+        if (customers.some((c) => c.email === email))
+          return { ok: false, error: "Já existe uma conta com este e-mail." };
+        const created: Customer = {
+          ...input,
+          email,
+          id: `c-${Date.now()}`,
+          createdAt: now(),
+        };
+        setCustomers((prev) => [...prev, created]);
+        setCustomerId(created.id);
+        return { ok: true };
+      },
+      loginCustomer: (email, password) => {
+        const found = customers.find(
+          (c) => c.email === email.trim().toLowerCase() && c.password === password,
+        );
+        if (!found) return { ok: false, error: "E-mail ou senha inválidos." };
+        setCustomerId(found.id);
+        return { ok: true };
+      },
+      logoutCustomer: () => setCustomerId(null),
       siteConfig,
       updateSiteConfig: setSiteConfig,
-    }),
-    [
-      products,
-      orders,
-      cart,
-      cartCount,
-      cartTotal,
-      cartOpen,
-      addToCart,
-      updateQty,
-      removeFromCart,
-      placeOrder,
-      isAdmin,
-      siteConfig,
-    ],
-  );
+    };
+  }, [
+    products,
+    orders,
+    cart,
+    cartCount,
+    cartTotal,
+    cartOpen,
+    addToCart,
+    updateQty,
+    removeFromCart,
+    placeOrder,
+    pushEvent,
+    isAdmin,
+    customers,
+    customerId,
+    siteConfig,
+  ]);
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;
 }
