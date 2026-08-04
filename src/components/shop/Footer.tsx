@@ -1,12 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { CreditCard, Lock, ShieldCheck, Truck } from "lucide-react";
 
-import { CATEGORIES } from "@/lib/shop-data";
 
 import { useShop } from "@/lib/shop-store";
 
 export function Footer() {
-  const { siteConfig } = useShop();
+  const { siteConfig, categories } = useShop();
   return (
     <footer className="mt-20 border-t border-border bg-surface">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
@@ -21,7 +20,7 @@ export function Footer() {
         <div>
           <p className="text-sm font-semibold">Categorias</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            {CATEGORIES.map((c) => (
+            {categories.map((c) => (
               <li key={c.slug}>
                 <Link
                   to="/catalogo"

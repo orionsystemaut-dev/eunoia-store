@@ -5,11 +5,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { CATEGORIES } from "@/lib/shop-data";
 import { useShop } from "@/lib/shop-store";
 
 export function Header() {
-  const { cartCount, setCartOpen, isAdmin, customer, siteConfig } = useShop();
+  const { cartCount, setCartOpen, isAdmin, customer, siteConfig, categories } = useShop();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -32,7 +31,7 @@ export function Header() {
             <SheetContent side="left" className="w-72 p-6">
               <p className="font-display text-lg font-semibold">Categorias</p>
               <nav className="mt-4 flex flex-col gap-1">
-                {CATEGORIES.map((c) => (
+                {categories.map((c) => (
                   <Link
                     key={c.slug}
                     to="/catalogo"
@@ -118,7 +117,7 @@ export function Header() {
           >
             Todos os produtos
           </Link>
-          {CATEGORIES.map((c) => (
+          {categories.map((c) => (
             <Link
               key={c.slug}
               to="/catalogo"

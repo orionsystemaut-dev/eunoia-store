@@ -5,7 +5,6 @@ import { ProductCard } from "@/components/shop/ProductCard";
 import { StoreShell } from "@/components/shop/StoreShell";
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/hero.jpg";
-import { CATEGORIES } from "@/lib/shop-data";
 import { useShop } from "@/lib/shop-store";
 
 export const Route = createFileRoute("/")({
@@ -29,7 +28,7 @@ export const Route = createFileRoute("/")({
 
 
 function Home() {
-  const { products, siteConfig } = useShop();
+  const { products, siteConfig, categories } = useShop();
   const featured = products.filter((p) => p.featured).slice(0, 4);
   const news = products.filter((p) => p.isNew).slice(0, 4);
 
@@ -99,7 +98,7 @@ function Home() {
       <section className="mx-auto max-w-7xl px-4 py-6 lg:px-8">
         <h2 className="font-display text-2xl font-bold sm:text-3xl">{siteConfig.categoriesTitle}</h2>
         <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {CATEGORIES.map((c) => (
+          {categories.map((c) => (
             <Link
               key={c.slug}
               to="/catalogo"

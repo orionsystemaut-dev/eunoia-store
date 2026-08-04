@@ -86,7 +86,13 @@ export type Order = {
   history?: OrderEvent[];
 };
 
-export const CATEGORIES = [
+export type Category = {
+  slug: string;
+  name: string;
+  emoji?: string;
+};
+
+export const DEFAULT_CATEGORIES: Category[] = [
   { slug: "audio", name: "Áudio", emoji: "🎧" },
   { slug: "wearables", name: "Wearables", emoji: "⌚" },
   { slug: "calcados", name: "Calçados", emoji: "👟" },

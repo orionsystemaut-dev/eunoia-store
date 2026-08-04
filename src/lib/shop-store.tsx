@@ -10,6 +10,8 @@ import {
 import {
   SEED_ORDERS,
   SEED_PRODUCTS,
+  DEFAULT_CATEGORIES,
+  type Category,
   type Customer,
   type Invoice,
   type Order,
@@ -136,6 +138,9 @@ type ShopState = {
   updateSiteConfig: (config: SiteConfig) => void;
   paymentConfig: PaymentConfig;
   updatePaymentConfig: (config: PaymentConfig) => void;
+  categories: Category[];
+  saveCategory: (category: Category) => void;
+  deleteCategory: (slug: string) => void;
 };
 
 const ShopContext = createContext<ShopState | null>(null);
@@ -151,6 +156,7 @@ type Persisted = {
   paymentConfig: PaymentConfig;
   customers: Customer[];
   customerId: string | null;
+  categories: Category[];
 };
 
 const now = () => new Date().toISOString();
@@ -164,6 +170,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const [customerId, setCustomerId] = useState<string | null>(null);
   const [siteConfig, setSiteConfig] = useState<SiteConfig>(DEFAULT_SITE_CONFIG);
   const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>(DEFAULT_PAYMENT_CONFIG);
+  const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [cartOpen, setCartOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
@@ -178,6 +185,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         if (parsed.paymentConfig) setPaymentConfig(parsed.paymentConfig);
         if (parsed.customers) setCustomers(parsed.customers);
         if (parsed.customerId) setCustomerId(parsed.customerId);
+        if (parsed.categories?.length) setCategories(parsed.categories);
         if (parsed.siteConfig)
           setSiteConfig({
             ...DEFAULT_SITE_CONFIG,
@@ -198,9 +206,9 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     if (!hydrated) return;
     localStorage.setItem(
       KEY,
-      JSON.stringify({ products, orders, cart, isAdmin, siteConfig, paymentConfig, customers, customerId }),
+      JSON.stringify({ products, orders, cart, isAdmin, siteConfig, paymentConfig, customers, customerId, categories }),
     );
-  }, [products, orders, cart, isAdmin, siteConfig, paymentConfig, customers, customerId, hydrated]);
+  }, [products, orders, cart, isAdmin, siteConfig, paymentConfig, customers, customerId, categories, hydrated]);
 
   const addToCart = useCallback((product: Product, variant: string, qty: number) => {
     setCart((prev) => {
@@ -370,6 +378,14 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       updateSiteConfig: setSiteConfig,
       paymentConfig,
       updatePaymentConfig: setPaymentConfig,
+      categories,
+      saveCategory: (category) =>
+        setCategories((prev) =>
+          prev.some((c) => c.slug === category.slug)
+            ? prev.map((c) => (c.slug === category.slug ? category : c))
+            : [...prev, category],
+        ),
+      deleteCategory: (slug) => setCategories((prev) => prev.filter((c) => c.slug !== slug)),
     };
   }, [
     products,
@@ -388,6 +404,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     customerId,
     siteConfig,
     paymentConfig,
+    categories,
   ]);
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;

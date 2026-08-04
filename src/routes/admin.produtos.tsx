@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Pencil, Plus, Trash2, Upload, X } from "lucide-react";
+import { FolderGit2, Pencil, Plus, Trash2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { AdminShell } from "@/components/admin/AdminShell";
@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { brl, CATEGORIES, PRODUCT_IMAGES, type Product } from "@/lib/shop-data";
+import { brl, PRODUCT_IMAGES, type Product } from "@/lib/shop-data";
 import { useShop } from "@/lib/shop-store";
 
 export const Route = createFileRoute("/admin/produtos")({
@@ -47,20 +47,24 @@ const emptyForm = {
   name: "",
   price: "",
   stock: "",
-  image: PRODUCT_IMAGES[0] ?? "",
+  image: "",
   gallery: [] as string[],
-  category: CATEGORIES[0]?.slug ?? "audio",
+  category: "",
   description: "",
 };
 
 function AdminProducts() {
-  const { products, saveProduct, deleteProduct } = useShop();
+  const { products, saveProduct, deleteProduct, categories, saveCategory, deleteCategory } = useShop();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [activeCategory, setActiveCategory] = useState<string>("todas");
 
+  // Category Manager State
+  const [catOpen, setCatOpen] = useState(false);
+  const [catForm, setCatForm] = useState({ slug: "", name: "", emoji: "" });
+
   const openNew = () => {
-    setForm(emptyForm);
+    setForm({ ...emptyForm, category: categories[0]?.slug ?? "" });
     setOpen(true);
   };
 
@@ -122,21 +126,42 @@ function AdminProducts() {
     setOpen(false);
   };
 
+  const saveCat = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!catForm.name.trim()) return;
+    const slug = catForm.slug.trim() || catForm.name.trim().toLowerCase().replace(/\s+/g, "-");
+    saveCategory({ slug, name: catForm.name.trim(), emoji: catForm.emoji });
+    setCatForm({ slug: "", name: "", emoji: "" });
+    toast.success("Categoria salva!");
+  };
+
+  const removeCat = (slug: string) => {
+    if (products.some(p => p.category === slug)) {
+      toast.error("Existem produtos nesta categoria. Remova-os primeiro.");
+      return;
+    }
+    deleteCategory(slug);
+    toast.success("Categoria removida");
+  };
+
   return (
     <AdminShell title="Produtos">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3">
         <p className="min-w-0 text-sm text-muted-foreground">
           {products.length} produtos no catálogo
         </p>
+        <Button variant="outline" onClick={() => setCatOpen(true)} className="shrink-0 gap-2">
+          <FolderGit2 className="h-4 w-4" /> Categorias
+        </Button>
         <Button onClick={openNew} className="shrink-0 gap-2">
-          <Plus className="h-4 w-4" /> Adicionar produto
+          <Plus className="h-4 w-4" /> Novo produto
         </Button>
       </div>
 
       <Tabs value={activeCategory} onValueChange={setActiveCategory} className="mt-5">
-        <TabsList className="mb-4">
+        <TabsList className="mb-4 flex-wrap h-auto">
           <TabsTrigger value="todas">Todas</TabsTrigger>
-          {CATEGORIES.map(c => (
+          {categories.map(c => (
             <TabsTrigger key={c.slug} value={c.slug}>{c.name}</TabsTrigger>
           ))}
         </TabsList>
@@ -168,7 +193,7 @@ function AdminProducts() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
-                    {CATEGORIES.find((c) => c.slug === p.category)?.name ?? p.category}
+                    {categories.find((c) => c.slug === p.category)?.name ?? p.category}
                   </td>
                   <td className="px-4 py-3">{brl(p.price)}</td>
                   <td className="px-4 py-3">
@@ -206,6 +231,7 @@ function AdminProducts() {
         </div>
       </Tabs>
 
+      {/* Product Modal */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
@@ -253,10 +279,10 @@ function AdminProducts() {
                 onValueChange={(v) => setForm({ ...form, category: v })}
               >
                 <SelectTrigger className="mt-1.5">
-                  <SelectValue />
+                  <SelectValue placeholder="Selecione..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.map((c) => (
+                  {categories.map((c) => (
                     <SelectItem key={c.slug} value={c.slug}>
                       {c.name}
                     </SelectItem>
@@ -308,6 +334,73 @@ function AdminProducts() {
               <Button type="submit">Salvar produto</Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Category Modal */}
+      <Dialog open={catOpen} onOpenChange={setCatOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-display">Gerenciar Categorias</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-8 md:grid-cols-2">
+            <div>
+              <p className="mb-4 text-sm font-semibold">Adicionar nova</p>
+              <form onSubmit={saveCat} className="space-y-4">
+                <div>
+                  <Label>Nome</Label>
+                  <Input 
+                    value={catForm.name} 
+                    onChange={e => setCatForm({ ...catForm, name: e.target.value })} 
+                    placeholder="Ex: Games" 
+                    className="mt-1" 
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Emoji</Label>
+                    <Input 
+                      value={catForm.emoji} 
+                      onChange={e => setCatForm({ ...catForm, emoji: e.target.value })} 
+                      placeholder="Ex: 🎮" 
+                      className="mt-1" 
+                    />
+                  </div>
+                  <div>
+                    <Label>Slug (Opcional)</Label>
+                    <Input 
+                      value={catForm.slug} 
+                      onChange={e => setCatForm({ ...catForm, slug: e.target.value })} 
+                      placeholder="games" 
+                      className="mt-1" 
+                    />
+                  </div>
+                </div>
+                <Button type="submit" className="w-full">Salvar</Button>
+              </form>
+            </div>
+            <div>
+              <p className="mb-4 text-sm font-semibold">Categorias cadastradas</p>
+              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+                {categories.map(c => (
+                  <div key={c.slug} className="flex items-center justify-between rounded-lg border border-border p-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{c.emoji}</span>
+                      <span className="font-medium">{c.name}</span>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-destructive"
+                      onClick={() => removeCat(c.slug)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </AdminShell>

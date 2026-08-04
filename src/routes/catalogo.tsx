@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { brl, CATEGORIES } from "@/lib/shop-data";
+import { brl } from "@/lib/shop-data";
 import { useShop } from "@/lib/shop-store";
 
 type CatalogSearch = { q: string; categoria: string; ordem: string };
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/catalogo")({
 });
 
 function Catalog() {
-  const { products } = useShop();
+  const { products, categories } = useShop();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const [maxPrice, setMaxPrice] = useState(2000);
@@ -85,7 +85,7 @@ function Catalog() {
           <h1 className="min-w-0 font-display text-2xl font-bold sm:text-3xl">
             {search.categoria === "todas"
               ? "Todos os produtos"
-              : (CATEGORIES.find((c) => c.slug === search.categoria)?.name ?? "Catálogo")}
+              : (categories.find((c) => c.slug === search.categoria)?.name ?? "Catálogo")}
           </h1>
           <Button
             variant="outline"
@@ -112,7 +112,7 @@ function Catalog() {
             <div className="rounded-2xl border border-border bg-card p-5">
               <p className="text-sm font-semibold">Categoria</p>
               <div className="mt-3 space-y-1">
-                {[{ slug: "todas", name: "Todas" }, ...CATEGORIES].map((c) => (
+                {[{ slug: "todas", name: "Todas" }, ...categories].map((c) => (
                   <button
                     key={c.slug}
                     onClick={() => setParam({ categoria: c.slug })}
