@@ -68,19 +68,34 @@ function Checkout() {
     );
   }
 
-  const handleIdentity = () => {
-    if (customer) return setStep(1);
+  const handleIdentity = (): void => {
+    if (customer) {
+      setStep(1);
+      return;
+    }
     if (mode === "login") {
       const res = loginCustomer(email, password);
-      if (!res.ok) return toast.error(res.error);
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
       toast.success("Bem-vindo de volta!");
-      return setStep(1);
+      setStep(1);
+      return;
     }
-    if (!name || !email || !password || !doc || !phone)
-      return toast.error("Preencha nome, e-mail, senha, CPF e telefone.");
-    if (password.length < 6) return toast.error("A senha precisa ter ao menos 6 caracteres.");
+    if (!name || !email || !password || !doc || !phone) {
+      toast.error("Preencha nome, e-mail, senha, CPF e telefone.");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("A senha precisa ter ao menos 6 caracteres.");
+      return;
+    }
     const res = registerCustomer({ name, email, password, doc, phone, cep, address });
-    if (!res.ok) return toast.error(res.error);
+    if (!res.ok) {
+      toast.error(res.error);
+      return;
+    }
     toast.success("Cadastro criado com sucesso!");
     setStep(1);
   };
@@ -201,7 +216,7 @@ function Checkout() {
                   <Button
                     className="flex-1"
                     onClick={() =>
-                      cep && address ? setStep(2) : toast.error("Informe CEP e endereço.")
+                      cep && address ? setStep(2) : void toast.error("Informe CEP e endereço.")
                     }
                   >
                     Continuar

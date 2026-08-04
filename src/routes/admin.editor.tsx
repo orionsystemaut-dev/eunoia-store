@@ -32,7 +32,8 @@ function AdminEditor() {
 
   const handlePerkChange = (index: number, field: "title" | "text", value: string) => {
     const newPerks = [...config.perks];
-    newPerks[index] = { ...newPerks[index], [field]: value };
+    const current = newPerks[index] ?? { title: "", text: "" };
+    newPerks[index] = { ...current, [field]: value };
     setConfig({ ...config, perks: newPerks });
   };
 

@@ -44,18 +44,30 @@ function Account() {
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const submit = (e: React.FormEvent) => {
+  const submit = (e: React.FormEvent): void => {
     e.preventDefault();
     if (mode === "login") {
       const res = loginCustomer(form.email, form.password);
-      if (!res.ok) return toast.error(res.error);
-      return toast.success("Login realizado!");
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success("Login realizado!");
+      return;
     }
-    if (!form.name || !form.email || !form.password || !form.doc)
-      return toast.error("Preencha nome, e-mail, senha e CPF.");
-    if (form.password.length < 6) return toast.error("A senha precisa ter ao menos 6 caracteres.");
+    if (!form.name || !form.email || !form.password || !form.doc) {
+      toast.error("Preencha nome, e-mail, senha e CPF.");
+      return;
+    }
+    if (form.password.length < 6) {
+      toast.error("A senha precisa ter ao menos 6 caracteres.");
+      return;
+    }
     const res = registerCustomer(form);
-    if (!res.ok) return toast.error(res.error);
+    if (!res.ok) {
+      toast.error(res.error);
+      return;
+    }
     toast.success("Cadastro criado!");
   };
 
