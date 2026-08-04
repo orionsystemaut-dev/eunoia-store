@@ -16,7 +16,7 @@ const nav = [
 ] as const;
 
 export function AdminShell({ title, children }: { title: string; children: ReactNode }) {
-  const { isAdmin, logout } = useShop();
+  const { isAdmin, logout, siteConfig } = useShop();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
@@ -36,12 +36,16 @@ export function AdminShell({ title, children }: { title: string; children: React
     <div className="flex min-h-screen flex-col bg-surface lg:flex-row">
       <aside className="flex shrink-0 flex-col gap-1 border-b border-border bg-card px-4 py-4 lg:w-64 lg:border-b-0 lg:border-r lg:px-5 lg:py-6">
         <div className="flex items-center gap-2 pb-4">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary font-display text-sm font-bold text-primary-foreground">
-            O
-          </span>
+          {siteConfig.logoUrl ? (
+            <img src={siteConfig.logoUrl} alt={siteConfig.storeName} className="h-9 w-auto object-contain rounded-md" />
+          ) : (
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary font-display text-sm font-bold text-primary-foreground">
+              {siteConfig.storeName.charAt(0)}
+            </span>
+          )}
           <div className="min-w-0">
-            <p className="font-display text-sm font-bold">Orion Admin</p>
-            <p className="truncate text-xs text-muted-foreground">Gestor: ORION</p>
+            <p className="font-display text-sm font-bold">{siteConfig.storeName} Admin</p>
+            <p className="truncate text-xs text-muted-foreground">Gestor: ADMIN</p>
           </div>
         </div>
         <nav className="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible">
