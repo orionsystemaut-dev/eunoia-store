@@ -1,9 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useState } from "react";
+import { FileText, Printer } from "lucide-react";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -43,6 +51,9 @@ function AdminOrders() {
   const { orders, updateOrderStatus } = useShop();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "Todos">("Todos");
+  
+  const [showNfId, setShowNfId] = useState<string | null>(null);
+  const selectedOrder = orders.find(o => o.id === showNfId);
 
   const filteredOrders = orders.filter((o) => {
     const matchesSearch = o.id.toLowerCase().includes(search.toLowerCase());
@@ -117,6 +128,11 @@ function AdminOrders() {
                     <Badge variant="outline" className={`hidden lg:inline-flex ${statusTone[o.status]}`}>
                       {o.status}
                     </Badge>
+                    {o.status !== "Aguardando Pagamento" && (
+                      <Button variant="ghost" size="icon" title="Ver Nota Fiscal" onClick={() => setShowNfId(o.id)}>
+                        <FileText className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    )}
                     <Select
                       value={o.status}
                       onValueChange={(v) => {
@@ -143,6 +159,40 @@ function AdminOrders() {
           </tbody>
         </table>
       </div>
+
+      <Dialog open={!!showNfId} onOpenChange={(open) => !open && setShowNfId(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-brand" /> 
+              Nota Fiscal do Pedido
+            </DialogTitle>
+          </DialogHeader>
+          {selectedOrder && (
+            <div className="space-y-4 pt-4 text-sm">
+              <div className="border-b border-border pb-4">
+                <p className="font-bold">ORION STORE LTDA</p>
+                <p className="text-muted-foreground">CNPJ: 12.345.678/0001-90</p>
+                <p className="text-muted-foreground mt-2">Data: {selectedOrder.date}</p>
+                <p className="text-muted-foreground">Pedido: {selectedOrder.id}</p>
+              </div>
+              <div className="border-b border-border pb-4">
+                <p className="font-bold mb-2">CLIENTE</p>
+                <p>{selectedOrder.customer}</p>
+              </div>
+              <div className="border-b border-border pb-4">
+                <div className="flex justify-between font-bold mb-2">
+                  <span>TOTAL PAGO</span>
+                  <span>{brl(selectedOrder.total)}</span>
+                </div>
+              </div>
+              <Button className="w-full gap-2" variant="outline" onClick={() => {toast.success("Impressão iniciada!"); setShowNfId(null);}}>
+                <Printer className="h-4 w-4" /> Imprimir Comprovante
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </AdminShell>
   );
 }

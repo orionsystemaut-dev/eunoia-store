@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { AdminShell } from "@/components/admin/AdminShell";
@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { brl, CATEGORIES, PRODUCT_IMAGES, type Product } from "@/lib/shop-data";
 import { useShop } from "@/lib/shop-store";
 
@@ -47,6 +48,7 @@ const emptyForm = {
   price: "",
   stock: "",
   image: PRODUCT_IMAGES[0] ?? "",
+  gallery: [] as string[],
   category: CATEGORIES[0]?.slug ?? "audio",
   description: "",
 };
@@ -55,6 +57,7 @@ function AdminProducts() {
   const { products, saveProduct, deleteProduct } = useShop();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
+  const [activeCategory, setActiveCategory] = useState<string>("todas");
 
   const openNew = () => {
     setForm(emptyForm);
@@ -68,10 +71,27 @@ function AdminProducts() {
       price: String(p.price),
       stock: String(p.stock),
       image: p.image,
+      gallery: p.gallery || (p.image ? [p.image] : []),
       category: p.category,
       description: p.description,
     });
     setOpen(true);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const files = Array.from(e.target.files);
+    Promise.all(files.map(f => new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.readAsDataURL(f);
+    }))).then(base64Arr => {
+      setForm(prev => ({ ...prev, gallery: [...prev.gallery, ...base64Arr] }));
+    });
+  };
+
+  const removeGalleryItem = (index: number) => {
+    setForm(prev => ({ ...prev, gallery: prev.gallery.filter((_, i) => i !== index) }));
   };
 
   const submit = (e: React.FormEvent) => {
@@ -89,7 +109,8 @@ function AdminProducts() {
       name: form.name.trim(),
       price,
       stock,
-      image: form.image || (PRODUCT_IMAGES[0] ?? ""),
+      image: form.gallery[0] || form.image || (PRODUCT_IMAGES[0] ?? ""),
+      gallery: form.gallery,
       category: form.category,
       description: form.description.trim() || "Produto da curadoria Orion.",
       variants: existing?.variants ?? ["Único"],
@@ -112,65 +133,78 @@ function AdminProducts() {
         </Button>
       </div>
 
-      <div className="mt-5 overflow-x-auto rounded-2xl border border-border bg-card">
-        <table className="w-full min-w-[640px] text-sm">
-          <thead className="border-b border-border text-left text-xs uppercase text-muted-foreground">
-            <tr>
-              <th className="px-4 py-3">Produto</th>
-              <th className="px-4 py-3">Categoria</th>
-              <th className="px-4 py-3">Preço</th>
-              <th className="px-4 py-3">Estoque</th>
-              <th className="px-4 py-3 text-right">Ações</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {products.map((p) => (
-              <tr key={p.id}>
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={p.image}
-                      alt={p.name}
-                      loading="lazy"
-                      width={800}
-                      height={800}
-                      className="h-11 w-11 shrink-0 rounded-lg border border-border object-cover"
-                    />
-                    <span className="min-w-0 truncate font-medium">{p.name}</span>
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-muted-foreground">
-                  {CATEGORIES.find((c) => c.slug === p.category)?.name ?? p.category}
-                </td>
-                <td className="px-4 py-3">{brl(p.price)}</td>
-                <td className="px-4 py-3">
-                  <span className={p.stock <= 5 ? "font-semibold text-destructive" : ""}>
-                    {p.stock}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex justify-end gap-1">
-                    <Button variant="ghost" size="icon" aria-label="Editar" onClick={() => openEdit(p)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Excluir"
-                      onClick={() => {
-                        deleteProduct(p.id);
-                        toast.success("Produto excluído");
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </div>
-                </td>
+      <Tabs value={activeCategory} onValueChange={setActiveCategory} className="mt-5">
+        <TabsList className="mb-4">
+          <TabsTrigger value="todas">Todas</TabsTrigger>
+          {CATEGORIES.map(c => (
+            <TabsTrigger key={c.slug} value={c.slug}>{c.name}</TabsTrigger>
+          ))}
+        </TabsList>
+
+        <div className="overflow-x-auto rounded-2xl border border-border bg-card">
+          <table className="w-full min-w-[640px] text-sm">
+            <thead className="border-b border-border text-left text-xs uppercase text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3">Produto</th>
+                <th className="px-4 py-3">Categoria</th>
+                <th className="px-4 py-3">Preço</th>
+                <th className="px-4 py-3">Estoque</th>
+                <th className="px-4 py-3 text-right">Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {products
+                .filter(p => activeCategory === "todas" || p.category === activeCategory)
+                .map((p) => (
+                <tr key={p.id}>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      {p.image?.startsWith("data:video") ? (
+                        <video src={p.image} className="h-11 w-11 shrink-0 rounded-lg border border-border object-cover" muted />
+                      ) : (
+                        <img src={p.image} alt={p.name} loading="lazy" width={800} height={800} className="h-11 w-11 shrink-0 rounded-lg border border-border object-cover" />
+                      )}
+                      <span className="min-w-0 truncate font-medium">{p.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    {CATEGORIES.find((c) => c.slug === p.category)?.name ?? p.category}
+                  </td>
+                  <td className="px-4 py-3">{brl(p.price)}</td>
+                  <td className="px-4 py-3">
+                    <span className={p.stock <= 5 ? "font-semibold text-destructive" : ""}>
+                      {p.stock}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex justify-end gap-1">
+                      <Button variant="ghost" size="icon" aria-label="Editar" onClick={() => openEdit(p)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Excluir"
+                        onClick={() => {
+                          deleteProduct(p.id);
+                          toast.success("Produto excluído");
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {products.filter(p => activeCategory === "todas" || p.category === activeCategory).length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">Nenhum produto nesta categoria.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Tabs>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
@@ -231,34 +265,31 @@ function AdminProducts() {
               </Select>
             </div>
             <div>
-              <Label>Imagem</Label>
-              <div className="mt-2 flex gap-3">
-                {PRODUCT_IMAGES.map((img) => (
-                  <button
-                    key={img}
-                    type="button"
-                    onClick={() => setForm({ ...form, image: img })}
-                    className={`overflow-hidden rounded-xl border-2 ${
-                      form.image === img ? "border-brand" : "border-border"
-                    }`}
-                  >
-                    <img
-                      src={img}
-                      alt=""
-                      loading="lazy"
-                      width={800}
-                      height={800}
-                      className="h-16 w-16 object-cover"
-                    />
-                  </button>
+              <Label>Galeria de Mídia (Imagens/Vídeos)</Label>
+              <div className="mt-2 grid grid-cols-4 gap-3">
+                {form.gallery.map((media, i) => (
+                  <div key={i} className="relative group overflow-hidden rounded-xl border border-border bg-muted aspect-square">
+                    {media.startsWith("data:video") ? (
+                      <video src={media} className="w-full h-full object-cover" muted />
+                    ) : (
+                      <img src={media} alt="" className="w-full h-full object-cover" />
+                    )}
+                    <button 
+                      type="button" 
+                      onClick={() => removeGalleryItem(i)} 
+                      className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
                 ))}
+                
+                <label className="border-2 border-dashed border-border rounded-xl aspect-square flex flex-col items-center justify-center text-muted-foreground hover:bg-muted/50 cursor-pointer transition-colors">
+                  <Upload className="h-6 w-6 mb-1" />
+                  <span className="text-[10px] uppercase font-bold tracking-wider">Upload</span>
+                  <input type="file" className="hidden" multiple accept="image/*,video/*" onChange={handleFileUpload} />
+                </label>
               </div>
-              <Input
-                value={form.image}
-                onChange={(e) => setForm({ ...form, image: e.target.value })}
-                placeholder="ou cole a URL da imagem"
-                className="mt-3"
-              />
             </div>
             <div>
               <Label htmlFor="p-desc">Descrição</Label>

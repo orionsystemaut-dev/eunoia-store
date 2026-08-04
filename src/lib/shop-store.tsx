@@ -29,6 +29,13 @@ export type PerkConfig = {
   text: string;
 };
 
+export type PaymentConfig = {
+  pixEnabled: boolean;
+  pixKey: string;
+  cardEnabled: boolean;
+  gatewayKey: string;
+};
+
 export type SiteConfig = {
   promoBar: string;
   heroTag: string;
@@ -62,6 +69,13 @@ const DEFAULT_SITE_CONFIG: SiteConfig = {
   footerDescription: "Tecnologia e design para o dia a dia. Curadoria de produtos com garantia estendida e entrega para todo o Brasil.",
 };
 
+const DEFAULT_PAYMENT_CONFIG: PaymentConfig = {
+  pixEnabled: true,
+  pixKey: "CNPJ 12.345.678/0001-90",
+  cardEnabled: true,
+  gatewayKey: "pk_test_12345",
+};
+
 type ShopState = {
   products: Product[];
   orders: Order[];
@@ -83,13 +97,15 @@ type ShopState = {
   logout: () => void;
   siteConfig: SiteConfig;
   updateSiteConfig: (config: SiteConfig) => void;
+  paymentConfig: PaymentConfig;
+  updatePaymentConfig: (config: PaymentConfig) => void;
 };
 
 const ShopContext = createContext<ShopState | null>(null);
 
 const KEY = "orion-shop-v1";
 
-type Persisted = { products: Product[]; orders: Order[]; cart: CartItem[]; isAdmin: boolean; siteConfig: SiteConfig };
+type Persisted = { products: Product[]; orders: Order[]; cart: CartItem[]; isAdmin: boolean; siteConfig: SiteConfig; paymentConfig: PaymentConfig };
 
 export function ShopProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>(SEED_PRODUCTS);
@@ -97,6 +113,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [siteConfig, setSiteConfig] = useState<SiteConfig>(DEFAULT_SITE_CONFIG);
+  const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>(DEFAULT_PAYMENT_CONFIG);
   const [cartOpen, setCartOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
@@ -109,6 +126,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         if (parsed.orders?.length) setOrders(parsed.orders);
         if (parsed.cart) setCart(parsed.cart);
         if (parsed.siteConfig) setSiteConfig(parsed.siteConfig);
+        if (parsed.paymentConfig) setPaymentConfig(parsed.paymentConfig);
         setIsAdmin(Boolean(parsed.isAdmin));
       }
     } catch {
@@ -119,8 +137,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem(KEY, JSON.stringify({ products, orders, cart, isAdmin, siteConfig }));
-  }, [products, orders, cart, isAdmin, siteConfig, hydrated]);
+    localStorage.setItem(KEY, JSON.stringify({ products, orders, cart, isAdmin, siteConfig, paymentConfig }));
+  }, [products, orders, cart, isAdmin, siteConfig, paymentConfig, hydrated]);
 
   const addToCart = useCallback((product: Product, variant: string, qty: number) => {
     setCart((prev) => {
@@ -211,6 +229,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       logout: () => setIsAdmin(false),
       siteConfig,
       updateSiteConfig: setSiteConfig,
+      paymentConfig,
+      updatePaymentConfig: setPaymentConfig,
     }),
     [
       products,
@@ -225,6 +245,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       placeOrder,
       isAdmin,
       siteConfig,
+      paymentConfig,
     ],
   );
 

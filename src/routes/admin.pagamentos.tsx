@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { useShop } from "@/lib/shop-store";
 
 export const Route = createFileRoute("/admin/pagamentos")({
   head: () => ({
@@ -20,13 +21,21 @@ export const Route = createFileRoute("/admin/pagamentos")({
 });
 
 function AdminPagamentos() {
-  const [pixEnabled, setPixEnabled] = useState(true);
-  const [pixKey, setPixKey] = useState("CNPJ 12.345.678/0001-90");
+  const { paymentConfig, updatePaymentConfig } = useShop();
   
-  const [cardEnabled, setCardEnabled] = useState(true);
-  const [gatewayKey, setGatewayKey] = useState("pk_test_12345");
+  const [pixEnabled, setPixEnabled] = useState(paymentConfig.pixEnabled);
+  const [pixKey, setPixKey] = useState(paymentConfig.pixKey);
+  
+  const [cardEnabled, setCardEnabled] = useState(paymentConfig.cardEnabled);
+  const [gatewayKey, setGatewayKey] = useState(paymentConfig.gatewayKey);
 
   const handleSave = () => {
+    updatePaymentConfig({
+      pixEnabled,
+      pixKey,
+      cardEnabled,
+      gatewayKey,
+    });
     toast.success("Configurações de pagamento salvas com sucesso!");
   };
 

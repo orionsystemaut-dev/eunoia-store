@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { CheckCircle2, Lock } from "lucide-react";
+import { CheckCircle2, Lock, QrCode, CreditCard, FileText, Printer } from "lucide-react";
 import { toast } from "sonner";
 
 import { StoreShell } from "@/components/shop/StoreShell";
@@ -8,7 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { brl } from "@/lib/shop-data";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { brl, type Order } from "@/lib/shop-data";
 import { useShop } from "@/lib/shop-store";
 
 export const Route = createFileRoute("/checkout")({
@@ -31,14 +37,19 @@ export const Route = createFileRoute("/checkout")({
 });
 
 function Checkout() {
-  const { cart, cartTotal, placeOrder } = useShop();
+  const { cart, cartTotal, placeOrder, paymentConfig, updateOrderStatus } = useShop();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [cep, setCep] = useState("");
   const [address, setAddress] = useState("");
-  const [payment, setPayment] = useState("pix");
-  const [done, setDone] = useState<string | null>(null);
+  
+  const initialPayment = paymentConfig.pixEnabled ? "pix" : paymentConfig.cardEnabled ? "cartao" : "boleto";
+  const [payment, setPayment] = useState(initialPayment);
+  
+  const [step, setStep] = useState<"checkout" | "payment" | "done">("checkout");
+  const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
+  const [showNf, setShowNf] = useState(false);
 
   const shipping = cartTotal >= 299 || cartTotal === 0 ? 0 : 24.9;
   const discount = payment === "pix" ? cartTotal * 0.12 : 0;
@@ -51,27 +62,120 @@ function Checkout() {
       return;
     }
     const order = placeOrder(name);
-    setDone(order.id);
+    setCurrentOrder(order);
+    setStep("payment");
   };
 
-  if (done) {
+  const handleSimulatePayment = () => {
+    if (currentOrder) {
+      updateOrderStatus(currentOrder.id, "Em Separação");
+      setStep("done");
+    }
+  };
+
+  if (step === "payment" && currentOrder) {
+    return (
+      <StoreShell>
+        <div className="mx-auto max-w-lg px-4 py-24 text-center">
+          <h1 className="font-display text-3xl font-bold">Pagamento</h1>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Pedido {currentOrder.id} gerado com sucesso. Efetue o pagamento para continuar.
+          </p>
+
+          {payment === "pix" && (
+            <div className="mt-8 rounded-2xl border border-border bg-card p-6">
+              <QrCode className="mx-auto h-24 w-24 text-brand mb-4" />
+              <p className="text-sm font-medium">Escaneie o QR Code ou use a chave PIX abaixo:</p>
+              <div className="mt-4 bg-muted p-3 rounded-lg text-sm font-mono border border-border">
+                {paymentConfig.pixKey}
+              </div>
+              <Button className="mt-6 w-full" onClick={handleSimulatePayment}>
+                Simular Pagamento Realizado
+              </Button>
+            </div>
+          )}
+
+          {payment === "cartao" && (
+            <div className="mt-8 rounded-2xl border border-border bg-card p-6">
+              <CreditCard className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+              <p className="text-sm font-medium">Insira os dados do seu cartão (Simulação via API: {paymentConfig.gatewayKey.substring(0,8)}...)</p>
+              <Input placeholder="Número do Cartão" className="mt-4" />
+              <div className="flex gap-4 mt-4">
+                <Input placeholder="MM/AA" />
+                <Input placeholder="CVC" />
+              </div>
+              <Button className="mt-6 w-full" onClick={handleSimulatePayment}>
+                Pagar {brl(total)}
+              </Button>
+            </div>
+          )}
+          
+          {payment === "boleto" && (
+            <div className="mt-8 rounded-2xl border border-border bg-card p-6">
+              <FileText className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+              <p className="text-sm font-medium">Boleto gerado com sucesso.</p>
+              <Button className="mt-6 w-full" onClick={handleSimulatePayment}>
+                Simular Pagamento do Boleto
+              </Button>
+            </div>
+          )}
+        </div>
+      </StoreShell>
+    );
+  }
+
+  if (step === "done" && currentOrder) {
     return (
       <StoreShell>
         <div className="mx-auto max-w-lg px-4 py-24 text-center">
           <CheckCircle2 className="mx-auto h-14 w-14 text-success" />
-          <h1 className="mt-5 font-display text-3xl font-bold">Pedido confirmado!</h1>
+          <h1 className="mt-5 font-display text-3xl font-bold">Pagamento Aprovado!</h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            Seu pedido <strong className="text-foreground">{done}</strong> foi registrado e está
-            aguardando pagamento. Enviamos os detalhes para o seu e-mail.
+            Seu pedido <strong className="text-foreground">{currentOrder.id}</strong> foi confirmado e já está em separação.
           </p>
           <div className="mt-8 flex justify-center gap-3">
+            <Button variant="outline" onClick={() => setShowNf(true)} className="gap-2">
+              <FileText className="h-4 w-4" /> Ver Nota Fiscal
+            </Button>
             <Link to="/">
-              <Button>Voltar à loja</Button>
-            </Link>
-            <Link to="/admin">
-              <Button variant="outline">Ver no painel</Button>
+              <Button>Continuar Comprando</Button>
             </Link>
           </div>
+
+          <Dialog open={showNf} onOpenChange={setShowNf}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-brand" /> 
+                  Nota Fiscal Eletrônica
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 pt-4 text-sm">
+                <div className="border-b border-border pb-4">
+                  <p className="font-bold">ORION STORE LTDA</p>
+                  <p className="text-muted-foreground">CNPJ: 12.345.678/0001-90</p>
+                  <p className="text-muted-foreground mt-2">Data: {new Date().toLocaleDateString('pt-BR')}</p>
+                  <p className="text-muted-foreground">Pedido: {currentOrder.id}</p>
+                </div>
+                <div className="border-b border-border pb-4">
+                  <p className="font-bold mb-2">CLIENTE</p>
+                  <p>{name}</p>
+                  <p className="text-muted-foreground">{email}</p>
+                  <p className="text-muted-foreground">{address} - CEP: {cep}</p>
+                </div>
+                <div className="border-b border-border pb-4">
+                  <div className="flex justify-between font-bold mb-2">
+                    <span>TOTAL PAGO</span>
+                    <span>{brl(total)}</span>
+                  </div>
+                  <p className="text-muted-foreground text-xs text-right">Forma de pagamento: {payment.toUpperCase()}</p>
+                </div>
+                <Button className="w-full gap-2" variant="outline" onClick={() => {toast.success("Impressão iniciada!"); setShowNf(false);}}>
+                  <Printer className="h-4 w-4" /> Imprimir Comprovante
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </StoreShell>
     );
@@ -150,19 +254,22 @@ function Checkout() {
             <section className="rounded-2xl border border-border bg-card p-6">
               <h2 className="font-display text-lg font-semibold">Pagamento</h2>
               <RadioGroup value={payment} onValueChange={setPayment} className="mt-4 space-y-3">
-                {[
-                  { id: "pix", label: "Pix — 12% de desconto" },
-                  { id: "cartao", label: "Cartão de crédito — até 10x sem juros" },
-                  { id: "boleto", label: "Boleto bancário" },
-                ].map((opt) => (
-                  <label
-                    key={opt.id}
-                    className="flex cursor-pointer items-center gap-3 rounded-xl border border-border p-4 text-sm has-[:checked]:border-brand"
-                  >
-                    <RadioGroupItem value={opt.id} id={opt.id} />
-                    {opt.label}
+                {paymentConfig.pixEnabled && (
+                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border p-4 text-sm has-[:checked]:border-brand">
+                    <RadioGroupItem value="pix" id="pix" />
+                    Pix — 12% de desconto
                   </label>
-                ))}
+                )}
+                {paymentConfig.cardEnabled && (
+                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border p-4 text-sm has-[:checked]:border-brand">
+                    <RadioGroupItem value="cartao" id="cartao" />
+                    Cartão de crédito — até 10x sem juros
+                  </label>
+                )}
+                <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border p-4 text-sm has-[:checked]:border-brand">
+                  <RadioGroupItem value="boleto" id="boleto" />
+                  Boleto bancário
+                </label>
               </RadioGroup>
             </section>
           </div>
