@@ -108,7 +108,14 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         if (parsed.products?.length) setProducts(parsed.products);
         if (parsed.orders?.length) setOrders(parsed.orders);
         if (parsed.cart) setCart(parsed.cart);
-        if (parsed.siteConfig) setSiteConfig(parsed.siteConfig);
+        if (parsed.siteConfig)
+          setSiteConfig({
+            ...DEFAULT_SITE_CONFIG,
+            ...parsed.siteConfig,
+            perks: parsed.siteConfig.perks?.length
+              ? parsed.siteConfig.perks
+              : DEFAULT_SITE_CONFIG.perks,
+          });
         setIsAdmin(Boolean(parsed.isAdmin));
       }
     } catch {
