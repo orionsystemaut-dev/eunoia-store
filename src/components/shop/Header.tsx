@@ -54,14 +54,20 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-          <Link to="/" className="flex shrink-0 items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary font-display text-sm font-bold text-primary-foreground">
-              {siteConfig.storeName.charAt(0)}
-            </span>
-            <span className="font-display text-lg font-bold tracking-tight sm:text-xl">
-              {siteConfig.storeName}<span className="text-brand">.</span>
-            </span>
-          </Link>
+            <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold tracking-tight">
+              {siteConfig.logoUrl ? (
+                <img src={siteConfig.logoUrl} alt={siteConfig.storeName} className="h-8 w-auto object-contain" />
+              ) : (
+                <>
+                  <div className="grid h-8 w-8 place-items-center rounded-xl bg-brand text-sm text-primary-foreground">
+                    {siteConfig.storeName.charAt(0)}
+                  </div>
+                  <span>
+                    {siteConfig.storeName}<span className="text-brand">.</span>
+                  </span>
+                </>
+              )}
+            </Link>
         </div>
 
         <form onSubmit={submit} className="relative hidden min-w-0 md:block">

@@ -56,10 +56,12 @@ export type SiteConfig = {
   newSubtitle: string;
   footerDescription: string;
   storeName: string;
+  logoUrl?: string;
   footerLinks: FooterLink[];
 };
 
 const DEFAULT_SITE_CONFIG: SiteConfig = {
+  logoUrl: "",
   promoBar: "Frete grátis acima de R$ 299",
   heroTag: "Semana Orion · até 35% OFF",
   heroTitle: "Tecnologia que combina com o seu ritmo.",

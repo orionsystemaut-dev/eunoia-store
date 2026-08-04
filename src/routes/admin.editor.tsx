@@ -67,6 +67,17 @@ function AdminEditor() {
     setConfig({ ...config, footerLinks: links });
   };
 
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setConfig({ ...config, logoUrl: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <AdminShell title="Editor do Site">
       <div className="grid lg:grid-cols-2 gap-8">
@@ -80,6 +91,18 @@ function AdminEditor() {
             </TabsList>
 
             <TabsContent value="global" className="space-y-6 mt-4 bg-card border border-border p-6 rounded-2xl">
+              <div className="space-y-2">
+                <Label>Logo da Loja</Label>
+                <div className="flex items-center gap-4">
+                  {config.logoUrl && (
+                    <img src={config.logoUrl} alt="Logo" className="h-10 w-auto object-contain bg-muted p-1 rounded-md" />
+                  )}
+                  <Input type="file" accept="image/*" onChange={handleLogoUpload} className="max-w-xs" />
+                  {config.logoUrl && (
+                    <Button variant="ghost" size="sm" onClick={() => setConfig({...config, logoUrl: ""})}>Remover</Button>
+                  )}
+                </div>
+              </div>
               <div className="space-y-2">
                 <Label>Nome da Loja</Label>
                 <Input value={config.storeName} onChange={e => setConfig({...config, storeName: e.target.value})} />

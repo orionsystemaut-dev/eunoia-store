@@ -14,9 +14,20 @@ export function Footer() {
     <footer className="mt-20 border-t border-border bg-surface">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
         <div>
-          <p className="font-display text-xl font-bold">
-            {siteConfig.storeName}<span className="text-brand">.</span>
-          </p>
+          <div className="flex items-center gap-2">
+            {siteConfig.logoUrl ? (
+              <img src={siteConfig.logoUrl} alt={siteConfig.storeName} className="h-8 w-auto object-contain grayscale opacity-70" />
+            ) : (
+              <>
+                <div className="grid h-8 w-8 place-items-center rounded-xl bg-brand text-sm font-bold text-primary-foreground">
+                  {siteConfig.storeName.charAt(0)}
+                </div>
+                <span className="font-display text-xl font-bold tracking-tight">
+                  {siteConfig.storeName}<span className="text-brand">.</span>
+                </span>
+              </>
+            )}
+          </div>
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">
             {siteConfig.footerDescription}
           </p>
