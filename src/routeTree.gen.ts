@@ -14,7 +14,9 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContaRouteImport } from './routes/conta'
+import { Route as TermosRouteImport } from './routes/termos'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminClientesRouteImport } from './routes/admin.clientes'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminEditorRouteImport } from './routes/admin.editor'
 import { Route as AdminPagamentosRouteImport } from './routes/admin.pagamentos'
@@ -49,9 +51,19 @@ const ContaRoute = ContaRouteImport.update({
   path: '/conta',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminClientesRoute = AdminClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
@@ -101,6 +113,8 @@ export interface FileRoutesByFullPath {
   '/catalogo': typeof CatalogoRoute
   '/checkout': typeof CheckoutRoute
   '/conta': typeof ContaRoute
+  '/termos': typeof TermosRoute
+  '/admin/clientes': typeof AdminClientesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/editor': typeof AdminEditorRoute
   '/admin/pagamentos': typeof AdminPagamentosRoute
@@ -116,6 +130,8 @@ export interface FileRoutesByTo {
   '/catalogo': typeof CatalogoRoute
   '/checkout': typeof CheckoutRoute
   '/conta': typeof ContaRoute
+  '/termos': typeof TermosRoute
+  '/admin/clientes': typeof AdminClientesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/editor': typeof AdminEditorRoute
   '/admin/pagamentos': typeof AdminPagamentosRoute
@@ -133,6 +149,8 @@ export interface FileRoutesById {
   '/catalogo': typeof CatalogoRoute
   '/checkout': typeof CheckoutRoute
   '/conta': typeof ContaRoute
+  '/termos': typeof TermosRoute
+  '/admin/clientes': typeof AdminClientesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/editor': typeof AdminEditorRoute
   '/admin/pagamentos': typeof AdminPagamentosRoute
@@ -151,6 +169,8 @@ export interface FileRouteTypes {
     | '/catalogo'
     | '/checkout'
     | '/conta'
+    | '/termos'
+    | '/admin/clientes'
     | '/admin/dashboard'
     | '/admin/editor'
     | '/admin/pagamentos'
@@ -166,6 +186,8 @@ export interface FileRouteTypes {
     | '/catalogo'
     | '/checkout'
     | '/conta'
+    | '/termos'
+    | '/admin/clientes'
     | '/admin/dashboard'
     | '/admin/editor'
     | '/admin/pagamentos'
@@ -182,6 +204,8 @@ export interface FileRouteTypes {
     | '/catalogo'
     | '/checkout'
     | '/conta'
+    | '/termos'
+    | '/admin/clientes'
     | '/admin/dashboard'
     | '/admin/editor'
     | '/admin/pagamentos'
@@ -199,6 +223,7 @@ export interface RootRouteChildren {
   CatalogoRoute: typeof CatalogoRoute
   CheckoutRoute: typeof CheckoutRoute
   ContaRoute: typeof ContaRoute
+  TermosRoute: typeof TermosRoute
   PedidoIdRoute: typeof PedidoIdRoute
   ProdutoIdRoute: typeof ProdutoIdRoute
 }
@@ -240,11 +265,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/clientes': {
+      id: '/admin/clientes'
+      path: '/clientes'
+      fullPath: '/admin/clientes'
+      preLoaderRoute: typeof AdminClientesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/dashboard': {
@@ -307,6 +346,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminClientesRoute: typeof AdminClientesRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminEditorRoute: typeof AdminEditorRoute
   AdminPagamentosRoute: typeof AdminPagamentosRoute
@@ -317,6 +357,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminClientesRoute: AdminClientesRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminEditorRoute: AdminEditorRoute,
   AdminPagamentosRoute: AdminPagamentosRoute,
@@ -334,6 +375,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogoRoute: CatalogoRoute,
   CheckoutRoute: CheckoutRoute,
   ContaRoute: ContaRoute,
+  TermosRoute: TermosRoute,
   PedidoIdRoute: PedidoIdRoute,
   ProdutoIdRoute: ProdutoIdRoute,
 }

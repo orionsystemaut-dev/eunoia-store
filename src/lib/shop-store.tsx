@@ -18,6 +18,7 @@ import {
   type OrderStatus,
   type Product,
 } from "./shop-data";
+import { encryptData, decryptData, hashPassword } from "./crypto";
 
 export type CartItem = {
   productId: string;
@@ -141,6 +142,7 @@ type ShopState = {
   categories: Category[];
   saveCategory: (category: Category) => void;
   deleteCategory: (slug: string) => void;
+  resetCustomerPassword: (id: string, newPass: string) => void;
 };
 
 const ShopContext = createContext<ShopState | null>(null);
@@ -178,9 +180,10 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     try {
       const raw = localStorage.getItem(KEY);
       if (raw) {
-        const parsed = JSON.parse(raw) as Partial<Persisted>;
-        if (parsed.products?.length) setProducts(parsed.products);
-        if (parsed.orders?.length) setOrders(parsed.orders);
+        const parsed = decryptData<Partial<Persisted>>(raw);
+        if (parsed) {
+          if (parsed.products?.length) setProducts(parsed.products);
+          if (parsed.orders?.length) setOrders(parsed.orders);
         if (parsed.cart) setCart(parsed.cart);
         if (parsed.paymentConfig) setPaymentConfig(parsed.paymentConfig);
         if (parsed.customers) setCustomers(parsed.customers);
@@ -194,7 +197,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
               ? parsed.siteConfig.perks
               : DEFAULT_SITE_CONFIG.perks,
           });
-        setIsAdmin(Boolean(parsed.isAdmin));
+          setIsAdmin(Boolean(parsed.isAdmin));
+        }
       }
     } catch {
       /* ignore corrupted storage */
@@ -204,10 +208,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem(
-      KEY,
-      JSON.stringify({ products, orders, cart, isAdmin, siteConfig, paymentConfig, customers, customerId, categories }),
-    );
+    const payload = { products, orders, cart, isAdmin, siteConfig, paymentConfig, customers, customerId, categories };
+    localStorage.setItem(KEY, encryptData(payload));
   }, [products, orders, cart, isAdmin, siteConfig, paymentConfig, customers, customerId, categories, hydrated]);
 
   const addToCart = useCallback((product: Product, variant: string, qty: number) => {
@@ -358,6 +360,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         const created: Customer = {
           ...input,
           email,
+          password: hashPassword(input.password),
           id: `c-${Date.now()}`,
           createdAt: now(),
         };
@@ -366,8 +369,9 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         return { ok: true };
       },
       loginCustomer: (email, password) => {
+        const hashed = hashPassword(password);
         const found = customers.find(
-          (c) => c.email === email.trim().toLowerCase() && c.password === password,
+          (c) => c.email === email.trim().toLowerCase() && (c.password === password || c.password === hashed),
         );
         if (!found) return { ok: false, error: "E-mail ou senha inválidos." };
         setCustomerId(found.id);
@@ -386,6 +390,9 @@ export function ShopProvider({ children }: { children: ReactNode }) {
             : [...prev, category],
         ),
       deleteCategory: (slug) => setCategories((prev) => prev.filter((c) => c.slug !== slug)),
+      resetCustomerPassword: (id, newPass) => {
+        setCustomers((prev) => prev.map((c) => (c.id === id ? { ...c, password: hashPassword(newPass) } : c)));
+      },
     };
   }, [
     products,

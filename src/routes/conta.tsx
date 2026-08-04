@@ -40,6 +40,7 @@ function Account() {
     cep: "",
     address: "",
   });
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -61,6 +62,10 @@ function Account() {
     }
     if (form.password.length < 6) {
       toast.error("A senha precisa ter ao menos 6 caracteres.");
+      return;
+    }
+    if (!termsAccepted) {
+      toast.error("Você precisa aceitar os Termos de Uso e a Política de Privacidade para continuar.");
       return;
     }
     const res = registerCustomer(form);
@@ -93,6 +98,23 @@ function Account() {
                 <Field label="Telefone" value={form.phone} onChange={set("phone")} />
                 <Field label="CEP" value={form.cep} onChange={set("cep")} />
                 <Field label="Endereço" value={form.address} onChange={set("address")} />
+                
+                <div className="flex items-start gap-2 pt-2">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                    className="mt-1 h-4 w-4 rounded border-border text-brand"
+                  />
+                  <Label htmlFor="terms" className="text-xs leading-relaxed text-muted-foreground">
+                    Li e concordo com os{" "}
+                    <Link to="/termos" target="_blank" className="font-semibold text-brand hover:underline">
+                      Termos de Uso
+                    </Link>{" "}
+                    e a Política de Privacidade.
+                  </Label>
+                </div>
               </>
             )}
             <Button type="submit" className="w-full">
