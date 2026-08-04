@@ -18,14 +18,50 @@ export type Product = {
   featured?: boolean;
 };
 
-export type OrderStatus = "Aguardando Pagamento" | "Em Separação" | "Enviado" | "Entregue";
+export type OrderStatus =
+  | "Aguardando Pagamento"
+  | "Pagamento Confirmado"
+  | "Em Separação"
+  | "Enviado"
+  | "Entregue";
 
 export const ORDER_STATUSES: OrderStatus[] = [
   "Aguardando Pagamento",
+  "Pagamento Confirmado",
   "Em Separação",
   "Enviado",
   "Entregue",
 ];
+
+export type OrderLine = {
+  productId: string;
+  name: string;
+  variant: string;
+  qty: number;
+  price: number;
+};
+
+export type Invoice = {
+  number: string;
+  series: string;
+  issuedAt: string;
+  key: string;
+  taxes: number;
+};
+
+export type OrderEvent = { at: string; label: string };
+
+export type Customer = {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  doc: string;
+  phone: string;
+  cep: string;
+  address: string;
+  createdAt: string;
+};
 
 export type Order = {
   id: string;
@@ -34,6 +70,20 @@ export type Order = {
   total: number;
   items: number;
   status: OrderStatus;
+  email?: string;
+  doc?: string;
+  phone?: string;
+  cep?: string;
+  address?: string;
+  payment?: string;
+  subtotal?: number;
+  shipping?: number;
+  discount?: number;
+  lines?: OrderLine[];
+  paymentConfirmed?: boolean;
+  valueConfirmed?: boolean;
+  invoice?: Invoice | null;
+  history?: OrderEvent[];
 };
 
 export const CATEGORIES = [

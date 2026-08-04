@@ -9,7 +9,7 @@ import { CATEGORIES } from "@/lib/shop-data";
 import { useShop } from "@/lib/shop-store";
 
 export function Header() {
-  const { cartCount, setCartOpen, isAdmin, siteConfig } = useShop();
+  const { cartCount, setCartOpen, isAdmin, customer, siteConfig } = useShop();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -77,12 +77,21 @@ export function Header() {
         </form>
 
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-          <Link to="/admin">
+          <Link to="/conta">
             <Button variant="ghost" size="sm" className="gap-2">
               <UserRound className="h-4 w-4" />
-              <span className="hidden sm:inline">{isAdmin ? "Painel" : "Entrar"}</span>
+              <span className="hidden max-w-[120px] truncate sm:inline">
+                {customer ? customer.name.split(" ")[0] : "Minha conta"}
+              </span>
             </Button>
           </Link>
+          {isAdmin && (
+            <Link to="/admin" className="hidden sm:block">
+              <Button variant="ghost" size="sm">
+                Painel
+              </Button>
+            </Link>
+          )}
           <Button
             variant="ghost"
             size="icon"

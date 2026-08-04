@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useState } from "react";
 import { FileText, Printer } from "lucide-react";
@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { brl, ORDER_STATUSES, type OrderStatus } from "@/lib/shop-data";
+import { statusTone } from "@/lib/order-flow";
 import { useShop } from "@/lib/shop-store";
 
 export const Route = createFileRoute("/admin/pedidos")({
@@ -39,13 +40,6 @@ export const Route = createFileRoute("/admin/pedidos")({
   }),
   component: AdminOrders,
 });
-
-const statusTone: Record<OrderStatus, string> = {
-  "Aguardando Pagamento": "bg-warning/15 text-warning-foreground border-warning/40",
-  "Em Separação": "bg-accent text-accent-foreground border-border",
-  Enviado: "bg-brand/15 text-brand border-brand/40",
-  Entregue: "bg-success/15 text-success border-success/40",
-};
 
 function AdminOrders() {
   const { orders, updateOrderStatus } = useShop();
@@ -106,19 +100,28 @@ function AdminOrders() {
               <th className="px-4 py-3">Itens</th>
               <th className="px-4 py-3">Total</th>
               <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Fluxo</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {filteredOrders.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                   Nenhum pedido encontrado.
                 </td>
               </tr>
             ) : (
               filteredOrders.map((o) => (
                 <tr key={o.id}>
-                <td className="px-4 py-3 font-medium">{o.id}</td>
+                <td className="px-4 py-3 font-medium">
+                  <Link
+                    to="/admin/pedido/$id"
+                    params={{ id: o.id.replace("#", "") }}
+                    className="text-brand hover:underline"
+                  >
+                    {o.id}
+                  </Link>
+                </td>
                 <td className="px-4 py-3">{o.customer}</td>
                 <td className="px-4 py-3 text-muted-foreground">{o.date}</td>
                 <td className="px-4 py-3">{o.items}</td>
@@ -152,6 +155,13 @@ function AdminOrders() {
                       </SelectContent>
                     </Select>
                   </div>
+                </td>
+                <td className="px-4 py-3">
+                  <Link to="/admin/pedido/$id" params={{ id: o.id.replace("#", "") }}>
+                    <Button variant="outline" size="sm">
+                      Gerenciar
+                    </Button>
+                  </Link>
                 </td>
                 </tr>
               ))
