@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as ContaRouteImport } from './routes/conta'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminEditorRouteImport } from './routes/admin.editor'
@@ -40,6 +41,11 @@ const CatalogoRoute = CatalogoRouteImport.update({
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContaRoute = ContaRouteImport.update({
+  id: '/conta',
+  path: '/conta',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/catalogo': typeof CatalogoRoute
   '/checkout': typeof CheckoutRoute
+  '/conta': typeof ContaRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/editor': typeof AdminEditorRoute
   '/admin/pagamentos': typeof AdminPagamentosRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/catalogo': typeof CatalogoRoute
   '/checkout': typeof CheckoutRoute
+  '/conta': typeof ContaRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/editor': typeof AdminEditorRoute
   '/admin/pagamentos': typeof AdminPagamentosRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/catalogo': typeof CatalogoRoute
   '/checkout': typeof CheckoutRoute
+  '/conta': typeof ContaRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/editor': typeof AdminEditorRoute
   '/admin/pagamentos': typeof AdminPagamentosRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/catalogo'
     | '/checkout'
+    | '/conta'
     | '/admin/dashboard'
     | '/admin/editor'
     | '/admin/pagamentos'
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
     | '/'
     | '/catalogo'
     | '/checkout'
+    | '/conta'
     | '/admin/dashboard'
     | '/admin/editor'
     | '/admin/pagamentos'
@@ -159,6 +170,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/catalogo'
     | '/checkout'
+    | '/conta'
     | '/admin/dashboard'
     | '/admin/editor'
     | '/admin/pagamentos'
@@ -174,6 +186,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   CatalogoRoute: typeof CatalogoRoute
   CheckoutRoute: typeof CheckoutRoute
+  ContaRoute: typeof ContaRoute
   PedidoIdRoute: typeof PedidoIdRoute
   ProdutoIdRoute: typeof ProdutoIdRoute
 }
@@ -206,6 +219,13 @@ declare module '@tanstack/react-router' {
       path: '/checkout'
       fullPath: '/checkout'
       preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conta': {
+      id: '/conta'
+      path: '/conta'
+      fullPath: '/conta'
+      preLoaderRoute: typeof ContaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -292,6 +312,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   CatalogoRoute: CatalogoRoute,
   CheckoutRoute: CheckoutRoute,
+  ContaRoute: ContaRoute,
   PedidoIdRoute: PedidoIdRoute,
   ProdutoIdRoute: ProdutoIdRoute,
 }
