@@ -215,7 +215,7 @@ function AdminOrderDetail() {
           </div>
           <div className="border-t border-border pt-4">
             <h3 className="text-sm font-semibold">Itens</h3>
-            <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+            <ul className="mt-2 space-y-1 text-sm text-muted-foreground border-b border-border pb-3">
               {(order.lines ?? []).map((l) => (
                 <li key={`${l.productId}-${l.variant}`} className="flex justify-between gap-2">
                   <span className="min-w-0 truncate">
@@ -226,8 +226,31 @@ function AdminOrderDetail() {
               ))}
               {!order.lines?.length && <li>{order.items} item(s)</li>}
             </ul>
+            <div className="mt-3 space-y-1 text-sm text-muted-foreground border-b border-border pb-3">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>{brl(order.subtotal ?? 0)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Frete</span>
+                <span>{brl(order.shipping ?? 0)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Desconto</span>
+                <span>- {brl(order.discount ?? 0)}</span>
+              </div>
+              {order.couponCode && (
+                <div className="flex justify-between">
+                  <span>Cupom</span>
+                  <span>{order.couponCode}</span>
+                </div>
+              )}
+            </div>
             <p className="mt-3 flex justify-between font-display text-lg font-bold">
-              <span>Total</span> <span>{brl(order.total)}</span>
+              <span>Total Pago</span> <span>{brl(order.total)}</span>
+            </p>
+            <p className="text-muted-foreground text-xs text-right mt-1 uppercase">
+              Pagamento: {order.payment ?? "Indefinido"}
             </p>
           </div>
           <Link to="/admin/pedidos">

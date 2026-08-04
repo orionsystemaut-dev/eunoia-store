@@ -56,10 +56,10 @@ export function Header() {
 
           <Link to="/" className="flex shrink-0 items-center gap-2">
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary font-display text-sm font-bold text-primary-foreground">
-              O
+              {siteConfig.storeName.charAt(0)}
             </span>
             <span className="font-display text-lg font-bold tracking-tight sm:text-xl">
-              Orion<span className="text-brand">.</span>
+              {siteConfig.storeName}<span className="text-brand">.</span>
             </span>
           </Link>
         </div>

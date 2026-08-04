@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Save } from "lucide-react";
+import { Save, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { AdminShell } from "@/components/admin/AdminShell";
@@ -9,6 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useShop } from "@/lib/shop-store";
 import type { SiteConfig } from "@/lib/shop-store";
 
@@ -22,8 +29,12 @@ export const Route = createFileRoute("/admin/editor")({
 function AdminEditor() {
   const { siteConfig, updateSiteConfig } = useShop();
   
-  const [config, setConfig] = useState<SiteConfig>(siteConfig);
-  const [activeTab, setActiveTab] = useState("hero");
+  const [config, setConfig] = useState<SiteConfig>({
+    ...siteConfig,
+    storeName: siteConfig.storeName || "Orion",
+    footerLinks: siteConfig.footerLinks || [],
+  });
+  const [activeTab, setActiveTab] = useState("global");
 
   const handleSave = () => {
     updateSiteConfig(config);
@@ -37,32 +48,127 @@ function AdminEditor() {
     setConfig({ ...config, perks: newPerks });
   };
 
+  const addFooterLink = () => {
+    setConfig({
+      ...config,
+      footerLinks: [...config.footerLinks, { id: `fl-${Date.now()}`, label: "Novo Link", actionType: "link", url: "" }]
+    });
+  };
+
+  const updateFooterLink = (index: number, field: string, value: string) => {
+    const links = [...config.footerLinks];
+    links[index] = { ...links[index], [field]: value } as any;
+    setConfig({ ...config, footerLinks: links });
+  };
+
+  const removeFooterLink = (index: number) => {
+    const links = [...config.footerLinks];
+    links.splice(index, 1);
+    setConfig({ ...config, footerLinks: links });
+  };
+
   return (
     <AdminShell title="Editor do Site">
       <div className="grid lg:grid-cols-2 gap-8">
         <div className="space-y-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full grid grid-cols-4">
-              <TabsTrigger value="hero">Hero</TabsTrigger>
-              <TabsTrigger value="sections">Seções</TabsTrigger>
-              <TabsTrigger value="perks">Benefícios</TabsTrigger>
-              <TabsTrigger value="global">Global</TabsTrigger>
+            <TabsList className="w-full grid grid-cols-4 h-auto flex-wrap">
+              <TabsTrigger value="global" className="py-2">Geral & Rodapé</TabsTrigger>
+              <TabsTrigger value="hero" className="py-2">Hero</TabsTrigger>
+              <TabsTrigger value="sections" className="py-2">Seções</TabsTrigger>
+              <TabsTrigger value="perks" className="py-2">Benefícios</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="global" className="space-y-6 mt-4 bg-card border border-border p-6 rounded-2xl">
+              <div className="space-y-2">
+                <Label>Nome da Loja</Label>
+                <Input value={config.storeName} onChange={e => setConfig({...config, storeName: e.target.value})} />
+              </div>
+              <div className="space-y-2">
+                <Label>Barra Promocional (Topo)</Label>
+                <Input value={config.promoBar} onChange={e => setConfig({...config, promoBar: e.target.value})} />
+              </div>
+              <div className="space-y-2">
+                <Label>Descrição da Loja (Rodapé)</Label>
+                <Textarea 
+                  value={config.footerDescription} 
+                  onChange={e => setConfig({...config, footerDescription: e.target.value})}
+                  className="h-20 resize-none"
+                />
+              </div>
+              
+              <div className="pt-4 border-t border-border space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-sm text-brand">Links do Rodapé</h3>
+                  <Button variant="outline" size="sm" onClick={addFooterLink} className="gap-2">
+                    <Plus className="h-4 w-4" /> Adicionar Link
+                  </Button>
+                </div>
+                
+                <div className="space-y-4">
+                  {config.footerLinks.map((link, i) => (
+                    <div key={link.id} className="relative rounded-xl border border-border p-4 bg-muted/30">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="absolute right-2 top-2 text-muted-foreground hover:text-destructive"
+                        onClick={() => removeFooterLink(i)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      
+                      <div className="grid gap-4 pr-8">
+                        <div className="space-y-2">
+                          <Label>Texto do Link</Label>
+                          <Input value={link.label} onChange={e => updateFooterLink(i, "label", e.target.value)} />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>Ação ao clicar</Label>
+                          <Select value={link.actionType} onValueChange={(v) => updateFooterLink(i, "actionType", v)}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="link">Abrir uma URL</SelectItem>
+                              <SelectItem value="modal">Abrir janela de texto (Modal)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        {link.actionType === "link" ? (
+                          <div className="space-y-2">
+                            <Label>URL de Destino</Label>
+                            <Input placeholder="/termos ou https://..." value={link.url || ""} onChange={e => updateFooterLink(i, "url", e.target.value)} />
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <Label>Conteúdo do Modal (Texto que aparecerá)</Label>
+                            <Textarea 
+                              className="min-h-[100px]" 
+                              value={link.modalContent || ""} 
+                              onChange={e => updateFooterLink(i, "modalContent", e.target.value)} 
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {config.footerLinks.length === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-4">Nenhum link configurado no rodapé.</p>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
 
             <TabsContent value="hero" className="space-y-4 mt-4 bg-card border border-border p-6 rounded-2xl">
               <div className="space-y-2">
                 <Label>Tag (ex: Semana Orion)</Label>
-                <Input 
-                  value={config.heroTag} 
-                  onChange={e => setConfig({...config, heroTag: e.target.value})} 
-                />
+                <Input value={config.heroTag} onChange={e => setConfig({...config, heroTag: e.target.value})} />
               </div>
               <div className="space-y-2">
                 <Label>Título Principal</Label>
-                <Input 
-                  value={config.heroTitle} 
-                  onChange={e => setConfig({...config, heroTitle: e.target.value})} 
-                />
+                <Input value={config.heroTitle} onChange={e => setConfig({...config, heroTitle: e.target.value})} />
               </div>
               <div className="space-y-2">
                 <Label>Subtítulo / Descrição</Label>
@@ -121,21 +227,6 @@ function AdminEditor() {
                 </div>
               ))}
             </TabsContent>
-
-            <TabsContent value="global" className="space-y-4 mt-4 bg-card border border-border p-6 rounded-2xl">
-              <div className="space-y-2">
-                <Label>Barra Promocional (Cabeçalho)</Label>
-                <Input value={config.promoBar} onChange={e => setConfig({...config, promoBar: e.target.value})} />
-              </div>
-              <div className="space-y-2">
-                <Label>Descrição da Loja (Rodapé)</Label>
-                <Textarea 
-                  value={config.footerDescription} 
-                  onChange={e => setConfig({...config, footerDescription: e.target.value})}
-                  className="h-24 resize-none"
-                />
-              </div>
-            </TabsContent>
           </Tabs>
 
           <Button onClick={handleSave} className="w-full gap-2" size="lg">
@@ -147,7 +238,7 @@ function AdminEditor() {
           <div className="bg-muted p-2 flex gap-1 items-center justify-center border-b border-border text-xs text-muted-foreground font-mono">
             Preview em tempo real
           </div>
-          <div className="flex-1 p-6 flex flex-col justify-center items-center text-center">
+          <div className="flex-1 p-6 flex flex-col justify-center items-center text-center overflow-y-auto">
             {activeTab === "hero" && (
               <>
                 <span className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">
@@ -195,8 +286,16 @@ function AdminEditor() {
                   Promo Bar: {config.promoBar}
                 </div>
                 <div className="border border-border p-4 rounded-lg bg-card text-left mt-auto">
-                  <p className="font-display font-bold">Orion.</p>
+                  <p className="font-display text-xl font-bold">{config.storeName}<span className="text-brand">.</span></p>
                   <p className="text-xs text-muted-foreground mt-2">{config.footerDescription}</p>
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <p className="text-xs font-semibold mb-2">Links simulados no Rodapé:</p>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      {config.footerLinks.map(l => (
+                        <li key={l.id}>• {l.label} ({l.actionType === 'modal' ? 'Janela Modal' : 'Link Web'})</li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               </div>
             )}

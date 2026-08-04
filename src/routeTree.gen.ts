@@ -17,6 +17,7 @@ import { Route as ContaRouteImport } from './routes/conta'
 import { Route as TermosRouteImport } from './routes/termos'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminClientesRouteImport } from './routes/admin.clientes'
+import { Route as AdminCuponsRouteImport } from './routes/admin.cupons'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminEditorRouteImport } from './routes/admin.editor'
 import { Route as AdminPagamentosRouteImport } from './routes/admin.pagamentos'
@@ -64,6 +65,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminClientesRoute = AdminClientesRouteImport.update({
   id: '/clientes',
   path: '/clientes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCuponsRoute = AdminCuponsRouteImport.update({
+  id: '/cupons',
+  path: '/cupons',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/conta': typeof ContaRoute
   '/termos': typeof TermosRoute
   '/admin/clientes': typeof AdminClientesRoute
+  '/admin/cupons': typeof AdminCuponsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/editor': typeof AdminEditorRoute
   '/admin/pagamentos': typeof AdminPagamentosRoute
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/conta': typeof ContaRoute
   '/termos': typeof TermosRoute
   '/admin/clientes': typeof AdminClientesRoute
+  '/admin/cupons': typeof AdminCuponsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/editor': typeof AdminEditorRoute
   '/admin/pagamentos': typeof AdminPagamentosRoute
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/conta': typeof ContaRoute
   '/termos': typeof TermosRoute
   '/admin/clientes': typeof AdminClientesRoute
+  '/admin/cupons': typeof AdminCuponsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/editor': typeof AdminEditorRoute
   '/admin/pagamentos': typeof AdminPagamentosRoute
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/termos'
     | '/admin/clientes'
+    | '/admin/cupons'
     | '/admin/dashboard'
     | '/admin/editor'
     | '/admin/pagamentos'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/termos'
     | '/admin/clientes'
+    | '/admin/cupons'
     | '/admin/dashboard'
     | '/admin/editor'
     | '/admin/pagamentos'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/termos'
     | '/admin/clientes'
+    | '/admin/cupons'
     | '/admin/dashboard'
     | '/admin/editor'
     | '/admin/pagamentos'
@@ -286,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminClientesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/cupons': {
+      id: '/admin/cupons'
+      path: '/cupons'
+      fullPath: '/admin/cupons'
+      preLoaderRoute: typeof AdminCuponsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/dashboard': {
       id: '/admin/dashboard'
       path: '/dashboard'
@@ -347,6 +366,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminClientesRoute: typeof AdminClientesRoute
+  AdminCuponsRoute: typeof AdminCuponsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminEditorRoute: typeof AdminEditorRoute
   AdminPagamentosRoute: typeof AdminPagamentosRoute
@@ -358,6 +378,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminClientesRoute: AdminClientesRoute,
+  AdminCuponsRoute: AdminCuponsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminEditorRoute: AdminEditorRoute,
   AdminPagamentosRoute: AdminPagamentosRoute,

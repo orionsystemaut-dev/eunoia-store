@@ -80,34 +80,41 @@ function OrderTracking() {
             <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
               <Package className="h-4 w-4" /> Itens
             </h2>
-            <ul className="mt-4 space-y-2 text-sm">
+            <ul className="mt-2 space-y-1 text-sm text-muted-foreground border-b border-border pb-3">
               {(order.lines ?? []).map((l) => (
-                <li key={`${l.productId}-${l.variant}`} className="flex justify-between gap-3">
+                <li key={`${l.productId}-${l.variant}`} className="flex justify-between gap-2">
                   <span className="min-w-0 truncate">
-                    {l.qty}x {l.name} · {l.variant}
+                    {l.qty}x {l.name}
                   </span>
-                  <span className="font-medium">{brl(l.price * l.qty)}</span>
+                  <span>{brl(l.price * l.qty)}</span>
                 </li>
               ))}
+              {!order.lines?.length && <li>{order.items} item(s)</li>}
             </ul>
-            <div className="mt-4 space-y-1 border-t border-border pt-3 text-sm text-muted-foreground">
-              {order.subtotal !== undefined && (
-                <p className="flex justify-between">
-                  <span>Subtotal</span> <span>{brl(order.subtotal)}</span>
-                </p>
-              )}
-              {order.shipping !== undefined && (
-                <p className="flex justify-between">
-                  <span>Frete</span> <span>{order.shipping === 0 ? "Grátis" : brl(order.shipping)}</span>
-                </p>
-              )}
-              {!!order.discount && (
-                <p className="flex justify-between">
-                  <span>Desconto</span> <span>- {brl(order.discount)}</span>
-                </p>
+            <div className="mt-3 space-y-1 text-sm text-muted-foreground border-t border-border pt-3">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>{brl(order.subtotal ?? 0)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Frete</span>
+                <span>{brl(order.shipping ?? 0)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Desconto</span>
+                <span>- {brl(order.discount ?? 0)}</span>
+              </div>
+              {order.couponCode && (
+                <div className="flex justify-between">
+                  <span>Cupom</span>
+                  <span>{order.couponCode}</span>
+                </div>
               )}
               <p className="flex justify-between pt-1 font-display text-base font-bold text-foreground">
-                <span>Total</span> <span>{brl(order.total)}</span>
+                <span>Total Pago</span> <span>{brl(order.total)}</span>
+              </p>
+              <p className="text-right text-xs uppercase pt-1">
+                Pagamento: {order.payment ?? "Indefinido"}
               </p>
             </div>
           </section>

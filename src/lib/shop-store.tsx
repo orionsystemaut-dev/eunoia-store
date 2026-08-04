@@ -17,6 +17,8 @@ import {
   type Order,
   type OrderStatus,
   type Product,
+  type Coupon,
+  type FooterLink,
 } from "./shop-data";
 import { encryptData, decryptData, hashPassword } from "./crypto";
 
@@ -53,6 +55,8 @@ export type SiteConfig = {
   newTitle: string;
   newSubtitle: string;
   footerDescription: string;
+  storeName: string;
+  footerLinks: FooterLink[];
 };
 
 const DEFAULT_SITE_CONFIG: SiteConfig = {
@@ -68,12 +72,20 @@ const DEFAULT_SITE_CONFIG: SiteConfig = {
     { title: "Suporte real", text: "Atendimento humano todos os dias" },
   ],
   featuredTitle: "Destaques da semana",
-  featuredSubtitle: "Os produtos mais desejados pelos nossos clientes",
+  featuredSubtitle: "Os produtos mais desejados com preços imperdíveis.",
   categoriesTitle: "Navegue por categoria",
   newTitle: "Lançamentos",
-  newSubtitle: "Recém-chegados na loja, com estoque limitado",
+  newSubtitle: "Chegaram as novidades que você esperava.",
   footerDescription:
-    "Tecnologia e design para o dia a dia. Curadoria de produtos com garantia estendida e entrega para todo o Brasil.",
+    "Inovação, design e a melhor curadoria de produtos direto para você.",
+  storeName: "Orion",
+  footerLinks: [
+    { id: "fl-1", label: "Central de atendimento", actionType: "modal", modalContent: "Telefone: 0800 123 456\nHorário: 08h às 18h" },
+    { id: "fl-2", label: "Trocas e devoluções", actionType: "modal", modalContent: "Você tem até 30 dias para solicitar devolução grátis em nosso site." },
+    { id: "fl-3", label: "Prazos de entrega", actionType: "modal", modalContent: "Capitais: até 3 dias úteis.\nInterior: até 7 dias úteis." },
+    { id: "fl-4", label: "Política de privacidade", actionType: "link", url: "/termos" },
+    { id: "fl-5", label: "Área do gestor", actionType: "link", url: "/admin" },
+  ],
 };
 
 export type PlaceOrderInput = {
@@ -88,6 +100,7 @@ export type PlaceOrderInput = {
   shipping: number;
   discount: number;
   total: number;
+  couponCode?: string;
 };
 
 export type RegisterInput = {
@@ -123,6 +136,9 @@ type ShopState = {
   saveProduct: (product: Product) => void;
   deleteProduct: (id: string) => void;
   updateOrderStatus: (id: string, status: OrderStatus) => void;
+  deleteOrder: (id: string) => void;
+  restoreOrder: (id: string) => void;
+  permanentlyDeleteOrder: (id: string) => void;
   confirmPayment: (id: string) => void;
   confirmValue: (id: string) => void;
   adjustOrderTotal: (id: string, total: number, reason: string) => void;
@@ -143,6 +159,9 @@ type ShopState = {
   saveCategory: (category: Category) => void;
   deleteCategory: (slug: string) => void;
   resetCustomerPassword: (id: string, newPass: string) => void;
+  coupons: Coupon[];
+  saveCoupon: (coupon: Coupon) => void;
+  deleteCoupon: (code: string) => void;
 };
 
 const ShopContext = createContext<ShopState | null>(null);
@@ -159,6 +178,7 @@ type Persisted = {
   customers: Customer[];
   customerId: string | null;
   categories: Category[];
+  coupons: Coupon[];
 };
 
 const now = () => new Date().toISOString();
@@ -173,6 +193,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const [siteConfig, setSiteConfig] = useState<SiteConfig>(DEFAULT_SITE_CONFIG);
   const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>(DEFAULT_PAYMENT_CONFIG);
   const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
@@ -184,19 +205,20 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         if (parsed) {
           if (parsed.products?.length) setProducts(parsed.products);
           if (parsed.orders?.length) setOrders(parsed.orders);
-        if (parsed.cart) setCart(parsed.cart);
-        if (parsed.paymentConfig) setPaymentConfig(parsed.paymentConfig);
-        if (parsed.customers) setCustomers(parsed.customers);
-        if (parsed.customerId) setCustomerId(parsed.customerId);
-        if (parsed.categories?.length) setCategories(parsed.categories);
-        if (parsed.siteConfig)
-          setSiteConfig({
-            ...DEFAULT_SITE_CONFIG,
-            ...parsed.siteConfig,
-            perks: parsed.siteConfig.perks?.length
-              ? parsed.siteConfig.perks
-              : DEFAULT_SITE_CONFIG.perks,
-          });
+          if (parsed.cart) setCart(parsed.cart);
+          if (parsed.paymentConfig) setPaymentConfig(parsed.paymentConfig);
+          if (parsed.customers) setCustomers(parsed.customers);
+          if (parsed.customerId) setCustomerId(parsed.customerId);
+          if (parsed.categories?.length) setCategories(parsed.categories);
+          if (parsed.coupons) setCoupons(parsed.coupons);
+          if (parsed.siteConfig)
+            setSiteConfig({
+              ...DEFAULT_SITE_CONFIG,
+              ...parsed.siteConfig,
+              perks: parsed.siteConfig.perks?.length
+                ? parsed.siteConfig.perks
+                : DEFAULT_SITE_CONFIG.perks,
+            });
           setIsAdmin(Boolean(parsed.isAdmin));
         }
       }
@@ -208,9 +230,9 @@ export function ShopProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    const payload = { products, orders, cart, isAdmin, siteConfig, paymentConfig, customers, customerId, categories };
+    const payload = { products, orders, cart, isAdmin, siteConfig, paymentConfig, customers, customerId, categories, coupons };
     localStorage.setItem(KEY, encryptData(payload));
-  }, [products, orders, cart, isAdmin, siteConfig, paymentConfig, customers, customerId, categories, hydrated]);
+  }, [products, orders, cart, isAdmin, siteConfig, paymentConfig, customers, customerId, categories, coupons, hydrated]);
 
   const addToCart = useCallback((product: Product, variant: string, qty: number) => {
     setCart((prev) => {
@@ -268,6 +290,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         subtotal: input.subtotal,
         shipping: input.shipping,
         discount: input.discount,
+        couponCode: input.couponCode,
         lines: cart.map((i) => ({
           productId: i.productId,
           name: i.name,
@@ -310,6 +333,15 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       addToCart,
       updateQty,
       removeFromCart,
+      deleteOrder: (id) => {
+        setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, isDeleted: true } : o)));
+      },
+      restoreOrder: (id) => {
+        setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, isDeleted: false } : o)));
+      },
+      permanentlyDeleteOrder: (id) => {
+        setOrders((prev) => prev.filter((o) => o.id !== id));
+      },
       clearCart: () => setCart([]),
       placeOrder,
       saveProduct: (product) =>
@@ -393,6 +425,14 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       resetCustomerPassword: (id, newPass) => {
         setCustomers((prev) => prev.map((c) => (c.id === id ? { ...c, password: hashPassword(newPass) } : c)));
       },
+      coupons,
+      saveCoupon: (coupon) =>
+        setCoupons((prev) =>
+          prev.some((c) => c.code === coupon.code)
+            ? prev.map((c) => (c.code === coupon.code ? coupon : c))
+            : [...prev, coupon],
+        ),
+      deleteCoupon: (code) => setCoupons((prev) => prev.filter((c) => c.code !== code)),
     };
   }, [
     products,
@@ -412,6 +452,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     siteConfig,
     paymentConfig,
     categories,
+    coupons,
   ]);
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;

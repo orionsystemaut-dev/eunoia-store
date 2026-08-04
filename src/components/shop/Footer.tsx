@@ -1,17 +1,21 @@
 import { Link } from "@tanstack/react-router";
 import { CreditCard, Lock, ShieldCheck, Truck } from "lucide-react";
-
+import { useState } from "react";
 
 import { useShop } from "@/lib/shop-store";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export function Footer() {
   const { siteConfig, categories } = useShop();
+  
+  const [modalContent, setModalContent] = useState<{title: string, content: string} | null>(null);
+
   return (
     <footer className="mt-20 border-t border-border bg-surface">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
         <div>
           <p className="font-display text-xl font-bold">
-            Orion<span className="text-brand">.</span>
+            {siteConfig.storeName}<span className="text-brand">.</span>
           </p>
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">
             {siteConfig.footerDescription}
@@ -36,15 +40,22 @@ export function Footer() {
         <div>
           <p className="text-sm font-semibold">Ajuda</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li>Central de atendimento</li>
-            <li>Trocas e devoluções</li>
-            <li>Prazos de entrega</li>
-            <li>Política de privacidade</li>
-            <li>
-              <Link to="/admin" className="hover:text-brand">
-                Área do gestor
-              </Link>
-            </li>
+            {siteConfig.footerLinks?.map(link => (
+              <li key={link.id}>
+                {link.actionType === "link" ? (
+                  <Link to={link.url || "/"} className="hover:text-brand">
+                    {link.label}
+                  </Link>
+                ) : (
+                  <button 
+                    onClick={() => setModalContent({ title: link.label, content: link.modalContent || "" })}
+                    className="hover:text-brand text-left"
+                  >
+                    {link.label}
+                  </button>
+                )}
+              </li>
+            ))}
           </ul>
         </div>
         <div>
@@ -66,9 +77,20 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-border py-5 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Orion Store · CNPJ 00.000.000/0001-00 · Todos os direitos
+        © {new Date().getFullYear()} {siteConfig.storeName} · CNPJ 00.000.000/0001-00 · Todos os direitos
         reservados
       </div>
+
+      <Dialog open={!!modalContent} onOpenChange={(v) => !v && setModalContent(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{modalContent?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="pt-4 text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+            {modalContent?.content}
+          </div>
+        </DialogContent>
+      </Dialog>
     </footer>
   );
 }

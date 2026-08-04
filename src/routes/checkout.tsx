@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { brl, type Order } from "@/lib/shop-data";
+import { brl, type Order, type Coupon } from "@/lib/shop-data";
 import { useShop } from "@/lib/shop-store";
 
 export const Route = createFileRoute("/checkout")({
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/checkout")({
 const STEPS = ["Identificação", "Entrega", "Pagamento", "Revisão"];
 
 function Checkout() {
-  const { cart, cartTotal, placeOrder, paymentConfig, updateOrderStatus, customer, registerCustomer, loginCustomer } = useShop();
+  const { cart, cartTotal, placeOrder, paymentConfig, updateOrderStatus, customer, registerCustomer, loginCustomer, coupons } = useShop();
   const navigate = useNavigate();
 
   const [step, setStep] = useState(customer ? 1 : 0);
@@ -57,10 +57,36 @@ function Checkout() {
   
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const [showNf, setShowNf] = useState(false);
+  
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
   const shipping = cartTotal >= 299 || cartTotal === 0 ? 0 : 24.9;
-  const discount = payment === "pix" ? cartTotal * 0.12 : 0;
-  const total = cartTotal + shipping - discount;
+  
+  const pixDiscount = payment === "pix" ? cartTotal * 0.12 : 0;
+  
+  let couponDiscount = 0;
+  if (appliedCoupon) {
+    if (appliedCoupon.type === "percent") {
+      couponDiscount = cartTotal * (appliedCoupon.discount / 100);
+    } else {
+      couponDiscount = appliedCoupon.discount;
+    }
+  }
+  
+  const discount = pixDiscount + couponDiscount;
+  const total = Math.max(0, cartTotal + shipping - discount);
+
+  const handleApplyCoupon = () => {
+    if (!couponInput) return;
+    const found = coupons.find(c => c.code === couponInput.toUpperCase() && c.isActive);
+    if (found) {
+      setAppliedCoupon(found);
+      toast.success("Cupom aplicado!");
+    } else {
+      toast.error("Cupom inválido ou expirado.");
+    }
+  };
 
   const handleSimulatePayment = () => {
     if (currentOrder) {
@@ -158,13 +184,32 @@ function Checkout() {
                   <p>{name}</p>
                   <p className="text-muted-foreground">{email}</p>
                   <p className="text-muted-foreground">{address} - CEP: {cep}</p>
+                  <p className="text-muted-foreground mt-2">Número da Nota: NFe-{currentOrder.id.replace('#', '')}</p>
                 </div>
                 <div className="border-b border-border pb-4">
-                  <div className="flex justify-between font-bold mb-2">
-                    <span>TOTAL PAGO</span>
-                    <span>{brl(total)}</span>
+                  <div className="flex justify-between text-muted-foreground mb-1">
+                    <span>Subtotal</span>
+                    <span>{brl(currentOrder.subtotal)}</span>
                   </div>
-                  <p className="text-muted-foreground text-xs text-right">Forma de pagamento: {payment.toUpperCase()}</p>
+                  <div className="flex justify-between text-muted-foreground mb-1">
+                    <span>Frete</span>
+                    <span>{brl(currentOrder.shipping)}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground mb-1">
+                    <span>Desconto</span>
+                    <span>- {brl(currentOrder.discount)}</span>
+                  </div>
+                  {currentOrder.couponCode && (
+                    <div className="flex justify-between text-muted-foreground mb-1">
+                      <span>Cupom</span>
+                      <span>{currentOrder.couponCode}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between font-bold mt-3 mb-2 pt-3 border-t border-border">
+                    <span>TOTAL PAGO</span>
+                    <span>{brl(currentOrder.total)}</span>
+                  </div>
+                  <p className="text-muted-foreground text-xs text-right mt-2 uppercase">Pagamento: {currentOrder.payment}</p>
                 </div>
                 <Button className="w-full gap-2" variant="outline" onClick={() => {toast.success("Impressão iniciada!"); setShowNf(false);}}>
                   <Printer className="h-4 w-4" /> Imprimir Comprovante
@@ -239,6 +284,7 @@ function Checkout() {
       shipping,
       discount,
       total,
+      couponCode: appliedCoupon?.code,
     });
     toast.success(`Pedido ${order.id} criado!`);
     setCurrentOrder(order);
@@ -434,12 +480,30 @@ function Checkout() {
               ))}
             </ul>
             <div className="mt-5 space-y-2 border-t border-border pt-4 text-sm">
-              <Row label="Subtotal" value={brl(cartTotal)} />
-              <Row label="Frete" value={shipping === 0 ? "Grátis" : brl(shipping)} />
-              {discount > 0 && <Row label="Desconto Pix" value={`- ${brl(discount)}`} />}
-              <div className="flex items-center justify-between pt-2 font-display text-lg font-bold">
-                <span>Total</span>
-                <span>{brl(total)}</span>
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="Cupom de desconto" 
+                  value={couponInput}
+                  onChange={(e) => setCouponInput(e.target.value)}
+                  disabled={!!appliedCoupon}
+                />
+                <Button 
+                  variant={appliedCoupon ? "destructive" : "secondary"}
+                  onClick={() => appliedCoupon ? setAppliedCoupon(null) : handleApplyCoupon()}
+                >
+                  {appliedCoupon ? "Remover" : "Aplicar"}
+                </Button>
+              </div>
+              
+              <div className="pt-2 space-y-2">
+                <Row label="Subtotal" value={brl(cartTotal)} />
+                <Row label="Frete" value={shipping === 0 ? "Grátis" : brl(shipping)} />
+                {pixDiscount > 0 && <Row label="Desconto Pix (12%)" value={`- ${brl(pixDiscount)}`} />}
+                {appliedCoupon && <Row label={`Cupom (${appliedCoupon.code})`} value={`- ${brl(couponDiscount)}`} />}
+                <div className="flex items-center justify-between pt-2 font-display text-lg font-bold">
+                  <span>Total</span>
+                  <span>{brl(total)}</span>
+                </div>
               </div>
             </div>
             <p className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground">

@@ -84,6 +84,23 @@ export type Order = {
   valueConfirmed?: boolean;
   invoice?: Invoice | null;
   history?: OrderEvent[];
+  isDeleted?: boolean;
+  couponCode?: string;
+};
+
+export type Coupon = {
+  code: string;
+  discount: number;
+  type: "percent" | "fixed";
+  isActive: boolean;
+};
+
+export type FooterLink = {
+  id: string;
+  label: string;
+  actionType: "link" | "modal";
+  url?: string;
+  modalContent?: string;
 };
 
 export type Category = {
