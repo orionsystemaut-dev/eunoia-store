@@ -243,15 +243,15 @@ function AdminOrders() {
               <div className="border-b border-border pb-4">
                 <div className="flex justify-between text-muted-foreground mb-1">
                   <span>Subtotal</span>
-                  <span>{brl(selectedOrder.subtotal)}</span>
+                  <span>{brl(selectedOrder.subtotal ?? 0)}</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground mb-1">
                   <span>Frete</span>
-                  <span>{brl(selectedOrder.shipping)}</span>
+                  <span>{brl(selectedOrder.shipping ?? 0)}</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground mb-1">
                   <span>Desconto</span>
-                  <span>- {brl(selectedOrder.discount)}</span>
+                  <span>- {brl(selectedOrder.discount ?? 0)}</span>
                 </div>
                 {selectedOrder.couponCode && (
                   <div className="flex justify-between text-muted-foreground mb-1">
@@ -261,9 +261,9 @@ function AdminOrders() {
                 )}
                 <div className="flex justify-between font-bold mt-3 mb-2 pt-3 border-t border-border">
                   <span>TOTAL PAGO</span>
-                  <span>{brl(selectedOrder.total)}</span>
+                  <span>{brl(selectedOrder.total ?? 0)}</span>
                 </div>
-                <p className="text-muted-foreground text-xs text-right mt-2 uppercase">Pagamento: {selectedOrder.payment}</p>
+                <p className="text-muted-foreground text-xs text-right mt-2 uppercase">Pagamento: {selectedOrder.payment ?? "N/A"}</p>
               </div>
               <Button className="w-full gap-2" variant="outline" onClick={() => {toast.success("Impressão iniciada!"); setShowNfId(null);}}>
                 <Printer className="h-4 w-4" /> Imprimir Comprovante
