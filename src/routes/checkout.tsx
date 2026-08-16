@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, CheckCircle2, Lock, QrCode, CreditCard, FileText, Printer } from "lucide-react";
 import { toast } from "sonner";
 
