@@ -1,7 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { BadgeCheck, FileText, Wallet } from "lucide-react";
+import { 
+  BadgeCheck, 
+  ChevronLeft, 
+  Clock, 
+  FileText, 
+  Package, 
+  Truck, 
+  Wallet,
+  Printer 
+} from "lucide-react";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { Badge } from "@/components/ui/badge";
@@ -110,9 +119,18 @@ function AdminOrderDetail() {
                 done={!!order.invoice}
                 label="4. Emissão da nota fiscal"
                 hint={
-                  order.invoice
-                    ? `NF-e ${order.invoice.number} · série ${order.invoice.series}`
-                    : "Disponível após confirmar pagamento e valor"
+                  order.invoice ? (
+                    <div className="flex flex-col gap-2">
+                      <span>NF-e {order.invoice.number} · série {order.invoice.series}</span>
+                      <Button variant="outline" size="sm" className="w-fit gap-2" asChild>
+                        <Link to="/nf/$id" params={{ id: order.id }} target="_blank">
+                          <Printer className="h-4 w-4" /> Visualizar / Baixar DANFE
+                        </Link>
+                      </Button>
+                    </div>
+                  ) : (
+                    "Disponível após confirmar pagamento e valor"
+                  )
                 }
                 action={
                   canInvoice && (

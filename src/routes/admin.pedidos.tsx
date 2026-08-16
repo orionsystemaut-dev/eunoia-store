@@ -41,9 +41,6 @@ function AdminOrders() {
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "Todos">("Todos");
   const [activeTab, setActiveTab] = useState<"ativos" | "lixeira">("ativos");
   
-  const [showNfId, setShowNfId] = useState<string | null>(null);
-  const selectedOrder = orders.find(o => o.id === showNfId);
-
   const activeOrders = orders.filter(o => !o.isDeleted);
   
   const filteredOrders = orders.filter((o) => {
@@ -161,8 +158,10 @@ function AdminOrders() {
                         {activeTab === "ativos" ? (
                           <>
                             {o.status !== "Aguardando Pagamento" && (
-                              <Button variant="ghost" size="icon" title="Ver Nota Fiscal" onClick={() => setShowNfId(o.id)}>
-                                <FileText className="h-4 w-4 text-muted-foreground" />
+                              <Button variant="ghost" size="icon" title="Ver Nota Fiscal" asChild>
+                                <Link to="/nf/$id" params={{ id: o.id }} target="_blank">
+                                  <FileText className="w-4 h-4 text-muted-foreground" />
+                                </Link>
                               </Button>
                             )}
                             <Link to="/admin/pedido/$id" params={{ id: o.id.replace("#", "") }}>
@@ -218,60 +217,6 @@ function AdminOrders() {
           </table>
         </div>
       </Tabs>
-
-      <Dialog open={!!showNfId} onOpenChange={(open) => !open && setShowNfId(null)}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-brand" /> 
-              Nota Fiscal do Pedido
-            </DialogTitle>
-          </DialogHeader>
-          {selectedOrder && (
-            <div className="space-y-4 pt-4 text-sm">
-              <div className="border-b border-border pb-4">
-                <p className="font-bold">ORION STORE LTDA</p>
-                <p className="text-muted-foreground">CNPJ: 12.345.678/0001-90</p>
-                <p className="text-muted-foreground mt-2">Data: {selectedOrder.date}</p>
-                <p className="text-muted-foreground">Pedido: {selectedOrder.id}</p>
-              </div>
-              <div className="border-b border-border pb-4">
-                <p className="font-bold mb-2">CLIENTE</p>
-                <p>{selectedOrder.customer}</p>
-                <p className="text-muted-foreground mt-2">Número da Nota: NFe-{selectedOrder.id.replace('#', '')}</p>
-              </div>
-              <div className="border-b border-border pb-4">
-                <div className="flex justify-between text-muted-foreground mb-1">
-                  <span>Subtotal</span>
-                  <span>{brl(selectedOrder.subtotal ?? 0)}</span>
-                </div>
-                <div className="flex justify-between text-muted-foreground mb-1">
-                  <span>Frete</span>
-                  <span>{brl(selectedOrder.shipping ?? 0)}</span>
-                </div>
-                <div className="flex justify-between text-muted-foreground mb-1">
-                  <span>Desconto</span>
-                  <span>- {brl(selectedOrder.discount ?? 0)}</span>
-                </div>
-                {selectedOrder.couponCode && (
-                  <div className="flex justify-between text-muted-foreground mb-1">
-                    <span>Cupom</span>
-                    <span>{selectedOrder.couponCode}</span>
-                  </div>
-                )}
-                <div className="flex justify-between font-bold mt-3 mb-2 pt-3 border-t border-border">
-                  <span>TOTAL PAGO</span>
-                  <span>{brl(selectedOrder.total ?? 0)}</span>
-                </div>
-                <p className="text-muted-foreground text-xs text-right mt-2 uppercase">Pagamento: {selectedOrder.payment ?? "N/A"}</p>
-              </div>
-              <Button className="w-full gap-2" variant="outline" onClick={() => {toast.success("Impressão iniciada!"); setShowNfId(null);}}>
-                <Printer className="h-4 w-4" /> Imprimir Comprovante
-              </Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </AdminShell>
   );
 }

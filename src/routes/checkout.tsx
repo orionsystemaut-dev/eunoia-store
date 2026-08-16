@@ -13,8 +13,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { brl, type Order, type Coupon } from "@/lib/shop-data";
+import { QRCodeSVG } from "qrcode.react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { brl, generatePixPayload, type Order, type Coupon } from "@/lib/shop-data";
 import { useShop } from "@/lib/shop-store";
 
 export const Route = createFileRoute("/checkout")({
@@ -39,7 +40,18 @@ export const Route = createFileRoute("/checkout")({
 const STEPS = ["Identificação", "Entrega", "Pagamento", "Revisão"];
 
 function Checkout() {
-  const { cart, cartTotal, placeOrder, paymentConfig, updateOrderStatus, customer, registerCustomer, loginCustomer, coupons } = useShop();
+  const { 
+    cart, 
+    cartTotal, 
+    placeOrder, 
+    paymentConfig, 
+    updateOrderStatus, 
+    customer, 
+    registerCustomer, 
+    loginCustomer, 
+    coupons,
+    shippingConfig 
+  } = useShop();
   const navigate = useNavigate();
 
   const [step, setStep] = useState(customer ? 1 : 0);
@@ -61,7 +73,7 @@ function Checkout() {
   const [couponInput, setCouponInput] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
-  const shipping = cartTotal >= 299 || cartTotal === 0 ? 0 : 24.9;
+  const shipping = cartTotal >= shippingConfig.freeShippingThreshold || cartTotal === 0 ? 0 : shippingConfig.fixedRate;
   
   const pixDiscount = payment === "pix" ? cartTotal * 0.12 : 0;
   
@@ -88,6 +100,21 @@ function Checkout() {
     }
   };
 
+  useEffect(() => {
+    const cleanCep = cep.replace(/\D/g, "");
+    if (cleanCep.length === 8) {
+      fetch(`https://viacep.com.br/ws/${cleanCep}/json/`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.erro) {
+            setAddress(`${data.logradouro}, `);
+            toast.success(`Endereço encontrado: ${data.localidade}/${data.uf}`);
+          }
+        })
+        .catch(console.error);
+    }
+  }, [cep]);
+
   const handleSimulatePayment = () => {
     if (currentOrder) {
       updateOrderStatus(currentOrder.id, "Em Separação");
@@ -108,8 +135,17 @@ function Checkout() {
             <div className="mt-8 rounded-2xl border border-border bg-card p-6">
               <QrCode className="mx-auto h-24 w-24 text-brand mb-4" />
               <p className="text-sm font-medium">Escaneie o QR Code ou use a chave PIX abaixo:</p>
-              <div className="mt-4 bg-muted p-3 rounded-lg text-sm font-mono border border-border">
-                {paymentConfig.pixKey}
+              <div className="mt-4 flex flex-col items-center gap-4 border border-border bg-card p-6 rounded-2xl">
+                <div className="bg-white p-2 rounded-xl">
+                  <QRCodeSVG 
+                    value={generatePixPayload(paymentConfig.pixKey, total, "Orion Store", "Sao Paulo")} 
+                    size={200} 
+                  />
+                </div>
+                <div className="w-full text-center">
+                  <p className="text-xs text-muted-foreground mb-1">Chave PIX</p>
+                  <p className="text-sm font-mono font-medium">{paymentConfig.pixKey}</p>
+                </div>
               </div>
               <Button className="mt-6 w-full" onClick={handleSimulatePayment}>
                 Simular Pagamento Realizado

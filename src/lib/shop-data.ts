@@ -270,3 +270,54 @@ export const SEED_ORDERS: Order[] = [
 
 export const brl = (value: number) =>
   value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+// PIX Payload Generator (BR Code format)
+function crc16(payload: string): string {
+  let crc = 0xffff;
+  for (let i = 0; i < payload.length; i++) {
+    crc ^= payload.charCodeAt(i) << 8;
+    for (let j = 0; j < 8; j++) {
+      if ((crc & 0x8000) > 0) {
+        crc = (crc << 1) ^ 0x1021;
+      } else {
+        crc = crc << 1;
+      }
+    }
+  }
+  return (crc & 0xffff).toString(16).toUpperCase().padStart(4, "0");
+}
+
+export function generatePixPayload(
+  pixKey: string,
+  amount: number,
+  merchantName: string = "Orion Store",
+  merchantCity: string = "Sao Paulo"
+): string {
+  const formatLength = (id: string, value: string) => {
+    const len = value.length.toString().padStart(2, "0");
+    return `${id}${len}${value}`;
+  };
+
+  const gui = formatLength("00", "br.gov.bcb.pix");
+  const key = formatLength("01", pixKey);
+  const accountInfo = formatLength("26", gui + key);
+  
+  const amtStr = amount.toFixed(2);
+  const mName = merchantName.substring(0, 25).replace(/[^\x20-\x7E]/g, '');
+  const mCity = merchantCity.substring(0, 15).replace(/[^\x20-\x7E]/g, '');
+
+  let payload = 
+    "000201" +
+    "010211" +
+    accountInfo +
+    "52040000" +
+    "5303986" +
+    (amount > 0 ? formatLength("54", amtStr) : "") +
+    "5802BR" +
+    formatLength("59", mName) +
+    formatLength("60", mCity) +
+    formatLength("62", formatLength("05", "***"));
+
+  payload += "6304";
+  return payload + crc16(payload);
+}

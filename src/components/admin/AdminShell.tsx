@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { LayoutDashboard, LogOut, Package, ReceiptText, Store, CreditCard, MonitorPlay, Users, Ticket } from "lucide-react";
+import { LayoutDashboard, LogOut, Package, ReceiptText, Store, CreditCard, MonitorPlay, Users, Ticket, Truck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useShop } from "@/lib/shop-store";
@@ -11,6 +11,7 @@ const nav = [
   { to: "/admin/pedidos", label: "Pedidos", icon: ReceiptText },
   { to: "/admin/clientes", label: "Clientes", icon: Users },
   { to: "/admin/pagamentos", label: "Pagamentos", icon: CreditCard },
+  { to: "/admin/frete", label: "Frete e Entrega", icon: Truck },
   { to: "/admin/cupons", label: "Cupons", icon: Ticket },
   { to: "/admin/editor", label: "Editor do Site", icon: MonitorPlay },
 ] as const;

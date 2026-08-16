@@ -43,6 +43,11 @@ export type PaymentConfig = {
   gatewayKey: string;
 };
 
+export type ShippingConfig = {
+  fixedRate: number;
+  freeShippingThreshold: number;
+};
+
 export type SiteConfig = {
   promoBar: string;
   heroTag: string;
@@ -122,6 +127,11 @@ const DEFAULT_PAYMENT_CONFIG: PaymentConfig = {
   gatewayKey: "pk_test_12345",
 };
 
+const DEFAULT_SHIPPING_CONFIG: ShippingConfig = {
+  fixedRate: 24.90,
+  freeShippingThreshold: 299.00,
+};
+
 type ShopState = {
   products: Product[];
   orders: Order[];
@@ -157,6 +167,8 @@ type ShopState = {
   updateSiteConfig: (config: SiteConfig) => void;
   paymentConfig: PaymentConfig;
   updatePaymentConfig: (config: PaymentConfig) => void;
+  shippingConfig: ShippingConfig;
+  updateShippingConfig: (config: ShippingConfig) => void;
   categories: Category[];
   saveCategory: (category: Category) => void;
   deleteCategory: (slug: string) => void;
@@ -177,6 +189,7 @@ type Persisted = {
   isAdmin: boolean;
   siteConfig: SiteConfig;
   paymentConfig: PaymentConfig;
+  shippingConfig: ShippingConfig;
   customers: Customer[];
   customerId: string | null;
   categories: Category[];
@@ -194,6 +207,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const [customerId, setCustomerId] = useState<string | null>(null);
   const [siteConfig, setSiteConfig] = useState<SiteConfig>(DEFAULT_SITE_CONFIG);
   const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>(DEFAULT_PAYMENT_CONFIG);
+  const [shippingConfig, setShippingConfig] = useState<ShippingConfig>(DEFAULT_SHIPPING_CONFIG);
   const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
@@ -209,6 +223,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
           if (parsed.orders?.length) setOrders(parsed.orders);
           if (parsed.cart) setCart(parsed.cart);
           if (parsed.paymentConfig) setPaymentConfig(parsed.paymentConfig);
+          if (parsed.shippingConfig) setShippingConfig(parsed.shippingConfig);
           if (parsed.customers) setCustomers(parsed.customers);
           if (parsed.customerId) setCustomerId(parsed.customerId);
           if (parsed.categories?.length) setCategories(parsed.categories);
@@ -232,9 +247,9 @@ export function ShopProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    const payload = { products, orders, cart, isAdmin, siteConfig, paymentConfig, customers, customerId, categories, coupons };
+    const payload = { products, orders, cart, isAdmin, siteConfig, paymentConfig, shippingConfig, customers, customerId, categories, coupons };
     localStorage.setItem(KEY, encryptData(payload));
-  }, [products, orders, cart, isAdmin, siteConfig, paymentConfig, customers, customerId, categories, coupons, hydrated]);
+  }, [products, orders, cart, isAdmin, siteConfig, paymentConfig, shippingConfig, customers, customerId, categories, coupons, hydrated]);
 
   const addToCart = useCallback((product: Product, variant: string, qty: number) => {
     setCart((prev) => {
@@ -416,6 +431,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       updateSiteConfig: setSiteConfig,
       paymentConfig,
       updatePaymentConfig: setPaymentConfig,
+      shippingConfig,
+      updateShippingConfig: setShippingConfig,
       categories,
       saveCategory: (category) =>
         setCategories((prev) =>
@@ -453,6 +470,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     customerId,
     siteConfig,
     paymentConfig,
+    shippingConfig,
     categories,
     coupons,
   ]);

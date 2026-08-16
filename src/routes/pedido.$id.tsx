@@ -123,28 +123,16 @@ function OrderTracking() {
             <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
               <FileText className="h-4 w-4" /> Nota fiscal
             </h2>
-            {order.invoice ? (
-              <div className="mt-4 space-y-2 text-sm">
-                <p>
-                  NF-e <strong>{order.invoice.number}</strong> · série {order.invoice.series}
-                </p>
-                <p className="text-muted-foreground">
-                  Emitida em {new Date(order.invoice.issuedAt).toLocaleString("pt-BR")}
-                </p>
-                <p className="break-all text-xs text-muted-foreground">
-                  Chave de acesso: {order.invoice.key}
-                </p>
-                <p className="text-muted-foreground">Tributos aprox.: {brl(order.invoice.taxes)}</p>
-                <Button variant="outline" className="mt-2 gap-2" onClick={() => window.print()}>
-                  <Printer className="h-4 w-4" /> Imprimir / salvar PDF
-                </Button>
-              </div>
-            ) : (
-              <p className="mt-4 text-sm text-muted-foreground">
-                A nota fiscal será emitida pelo gestor após a confirmação do pagamento e do valor do
-                pedido. Você receberá por e-mail em {order.email || "seu e-mail cadastrado"}.
+            <div className="mt-4 space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Sua nota fiscal eletrônica está disponível para visualização e impressão em formato padrão DANFE.
               </p>
-            )}
+              <Button variant="outline" className="gap-2" asChild>
+                <Link to="/nf/$id" params={{ id: order.id }} target="_blank">
+                  <Printer className="h-4 w-4" /> Visualizar / Baixar DANFE
+                </Link>
+              </Button>
+            </div>
           </section>
         </div>
 
