@@ -4,7 +4,6 @@ import { ArrowRight, BadgePercent, Headphones, RefreshCcw, Truck } from "lucide-
 import { ProductCard } from "@/components/shop/ProductCard";
 import { StoreShell } from "@/components/shop/StoreShell";
 import { Button } from "@/components/ui/button";
-import heroImg from "@/assets/hero.jpg";
 import { useShop } from "@/lib/shop-store";
 
 export const Route = createFileRoute("/")({
@@ -34,39 +33,46 @@ function Home() {
 
   return (
     <StoreShell>
-      <section className="relative overflow-hidden border-b border-border bg-surface">
-        <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-12 lg:grid-cols-2 lg:px-8 lg:py-20">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">
-              {siteConfig.heroTag}
+      <section className="relative flex min-h-[85vh] w-full items-center justify-center overflow-hidden border-b border-border bg-black">
+        {/* Animated Background Video */}
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover opacity-60"
+        >
+          <source src="https://assets.mixkit.co/videos/preview/mixkit-set-of-three-smartphones-in-a-dark-room-41838-large.mp4" type="video/mp4" />
+          <source src="https://cdn.coverr.co/videos/coverr-a-person-typing-on-a-macbook-5034/1080p.mp4" type="video/mp4" />
+        </video>
+
+        {/* Gradient Overlay for better readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+
+        {/* Glassmorphism Content Box */}
+        <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
+          <div className="rounded-3xl border border-white/20 bg-black/20 p-8 backdrop-blur-md shadow-2xl sm:p-14">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur-sm">
+              {siteConfig.heroTag || "Lançamento Oficial"}
             </span>
-            <h1 className="mt-5 font-display text-4xl font-bold leading-[1.05] sm:text-5xl lg:text-6xl">
+            <h1 className="mt-6 font-display text-4xl font-extrabold leading-[1.1] text-white drop-shadow-md sm:text-5xl lg:text-7xl">
               {siteConfig.heroTitle}
             </h1>
-            <p className="mt-4 max-w-md text-base text-muted-foreground">
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-200 drop-shadow">
               {siteConfig.heroSubtitle}
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-10 flex flex-wrap justify-center gap-4">
               <Link to="/catalogo" search={{ q: "", categoria: "todas", ordem: "relevancia" }}>
-                <Button size="lg" className="gap-2">
-                  Comprar agora <ArrowRight className="h-4 w-4" />
+                <Button size="lg" className="h-14 gap-2 rounded-full bg-white px-8 text-base text-black shadow-lg hover:scale-105 hover:bg-gray-100 transition-all">
+                  Comprar agora <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/catalogo" search={{ q: "", categoria: "audio", ordem: "menor-preco" }}>
-                <Button size="lg" variant="outline">
+                <Button size="lg" variant="outline" className="h-14 rounded-full border-white/40 bg-black/30 px-8 text-base text-white backdrop-blur-sm shadow-lg hover:scale-105 hover:bg-black/50 transition-all">
                   Ver ofertas
                 </Button>
               </Link>
             </div>
-          </div>
-          <div className="overflow-hidden rounded-3xl border border-border shadow-[var(--shadow-lift)]">
-            <img
-              src={heroImg}
-              alt="Headphone, tênis e smartwatch da coleção Orion sobre fundo bege"
-              width={1600}
-              height={900}
-              className="h-full w-full object-cover"
-            />
           </div>
         </div>
       </section>
