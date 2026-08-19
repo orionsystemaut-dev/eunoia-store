@@ -270,13 +270,13 @@ function Checkout() {
     );
   }
 
-  const handleIdentity = (): void => {
+  const handleIdentity = async (): Promise<void> => {
     if (customer) {
       setStep(1);
       return;
     }
     if (mode === "login") {
-      const res = loginCustomer(email, password);
+      const res = await loginCustomer(email, password);
       if (!res.ok) {
         toast.error(res.error);
         return;
@@ -293,7 +293,7 @@ function Checkout() {
       toast.error("A senha precisa ter ao menos 6 caracteres.");
       return;
     }
-    const res = registerCustomer({ name, email, password, doc, phone, cep, address });
+    const res = await registerCustomer({ name, email, password, doc, phone, cep, address });
     if (!res.ok) {
       toast.error(res.error);
       return;
@@ -302,8 +302,8 @@ function Checkout() {
     setStep(1);
   };
 
-  const finish = () => {
-    const order = placeOrder({
+  const finish = async () => {
+    const order = await placeOrder({
       name: customer?.name ?? name,
       email: customer?.email ?? email,
       doc: customer?.doc ?? doc,
@@ -317,10 +317,15 @@ function Checkout() {
       total,
       couponCode: appliedCoupon?.code,
     });
+    if (!order) {
+      toast.error("Não foi possível registrar o pedido. Entre na sua conta e tente novamente.");
+      return;
+    }
     toast.success(`Pedido ${order.id} criado!`);
     setCurrentOrder(order);
     setStep(4);
   };
+
 
   return (
     <StoreShell>

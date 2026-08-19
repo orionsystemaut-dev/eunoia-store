@@ -45,10 +45,10 @@ function Account() {
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const submit = (e: React.FormEvent): void => {
+  const submit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     if (mode === "login") {
-      const res = loginCustomer(form.email, form.password);
+      const res = await loginCustomer(form.email, form.password);
       if (!res.ok) {
         toast.error(res.error);
         return;
@@ -68,13 +68,14 @@ function Account() {
       toast.error("Você precisa aceitar os Termos de Uso e a Política de Privacidade para continuar.");
       return;
     }
-    const res = registerCustomer(form);
+    const res = await registerCustomer(form);
     if (!res.ok) {
       toast.error(res.error);
       return;
     }
     toast.success("Cadastro criado!");
   };
+
 
   if (!customer) {
     return (
