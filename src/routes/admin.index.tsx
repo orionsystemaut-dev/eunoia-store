@@ -39,14 +39,15 @@ function AdminLogin() {
     if (isAdmin) navigate({ to: "/admin/dashboard", replace: true });
   }, [isAdmin, navigate]);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(user, pass)) {
+    if (await login(user, pass)) {
       navigate({ to: "/admin/dashboard" });
     } else {
       setError(true);
     }
   };
+
 
   return (
     <div className="grid min-h-screen place-items-center bg-surface px-4 py-12">

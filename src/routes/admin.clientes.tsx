@@ -11,8 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { brl, type Customer } from "@/lib/shop-data";
 import { statusTone } from "@/lib/order-flow";
@@ -32,25 +30,24 @@ function AdminCustomers() {
   const { customers, orders, resetCustomerPassword } = useShop();
   const [selected, setSelected] = useState<Customer | null>(null);
   const [showMasked, setShowMasked] = useState(false);
-  const [newPass, setNewPass] = useState("");
-  const [resetMode, setResetMode] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const customerOrders = selected 
     ? orders.filter(o => o.email?.toLowerCase() === selected.email || o.customer === selected.name)
     : [];
 
-  const handleReset = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleReset = async () => {
     if (!selected) return;
-    if (newPass.length < 6) {
-      toast.error("A senha deve ter pelo menos 6 caracteres.");
+    setSending(true);
+    const res = await resetCustomerPassword(selected.id);
+    setSending(false);
+    if (!res.ok) {
+      toast.error(res.error ?? "Não foi possível enviar o link.");
       return;
     }
-    resetCustomerPassword(selected.id, newPass);
-    toast.success("Senha do cliente redefinida com sucesso (Armazenada como Hash).");
-    setNewPass("");
-    setResetMode(false);
+    toast.success("Link de redefinição enviado para o e-mail do cliente.");
   };
+
 
   const maskDoc = (doc: string) => showMasked ? doc : `***.${doc.slice(4, 7)}.***-**`;
   const maskPhone = (phone: string) => showMasked ? phone : `(**) *****-${phone.slice(-4)}`;
@@ -118,7 +115,7 @@ function AdminCustomers() {
         </table>
       </div>
 
-      <Dialog open={!!selected} onOpenChange={(v) => { if (!v) { setSelected(null); setResetMode(false); setShowMasked(false); }}}>
+      <Dialog open={!!selected} onOpenChange={(v) => { if (!v) { setSelected(null); setShowMasked(false); }}}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between font-display text-xl pr-6">
@@ -147,35 +144,16 @@ function AdminCustomers() {
                     <KeyRound className="h-4 w-4" />
                     Segurança da Conta
                   </h3>
-                  {!resetMode && (
-                    <Button variant="secondary" size="sm" onClick={() => setResetMode(true)}>
-                      Redefinir Senha
-                    </Button>
-                  )}
+                  <Button variant="secondary" size="sm" disabled={sending} onClick={handleReset}>
+                    {sending ? "Enviando..." : "Enviar link de redefinição"}
+                  </Button>
                 </div>
-                
-                {resetMode ? (
-                  <form onSubmit={handleReset} className="flex items-end gap-3 p-3 bg-secondary/50 rounded-lg border border-border">
-                    <div className="flex-1">
-                      <Label className="text-xs">Nova Senha (será criptografada em Hash SHA-256)</Label>
-                      <Input 
-                        type="password" 
-                        value={newPass} 
-                        onChange={(e) => setNewPass(e.target.value)} 
-                        className="mt-1.5"
-                        placeholder="Mínimo 6 caracteres"
-                      />
-                    </div>
-                    <Button type="button" variant="ghost" onClick={() => setResetMode(false)}>Cancelar</Button>
-                    <Button type="submit">Salvar</Button>
-                  </form>
-                ) : (
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    A senha deste cliente está protegida por Hash (SHA-256). 
-                    Você não pode visualizar a senha atual, mas pode forçar a redefinição caso o cliente perca o acesso.
-                  </p>
-                )}
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  As senhas ficam sob custódia do serviço de autenticação e nunca são visíveis.
+                  Ao enviar o link, o cliente recebe um e-mail seguro para criar uma nova senha.
+                </p>
               </div>
+
 
               <div>
                 <h3 className="font-semibold mb-3">Histórico de Compras ({customerOrders.length})</h3>
