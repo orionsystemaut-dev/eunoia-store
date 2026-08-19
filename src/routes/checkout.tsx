@@ -220,15 +220,15 @@ function Checkout() {
                 <div className="border-b border-border pb-4">
                   <div className="flex justify-between text-muted-foreground mb-1">
                     <span>Subtotal</span>
-                    <span>{brl(currentOrder.subtotal)}</span>
+                    <span>{brl(currentOrder.subtotal ?? 0)}</span>
                   </div>
                   <div className="flex justify-between text-muted-foreground mb-1">
                     <span>Frete</span>
-                    <span>{brl(currentOrder.shipping)}</span>
+                    <span>{brl(currentOrder.shipping ?? 0)}</span>
                   </div>
                   <div className="flex justify-between text-muted-foreground mb-1">
                     <span>Desconto</span>
-                    <span>- {brl(currentOrder.discount)}</span>
+                    <span>- {brl(currentOrder.discount ?? 0)}</span>
                   </div>
                   {currentOrder.couponCode && (
                     <div className="flex justify-between text-muted-foreground mb-1">
