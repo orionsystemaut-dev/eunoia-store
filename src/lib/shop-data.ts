@@ -85,7 +85,7 @@ export type Order = {
   invoice?: Invoice | null;
   history?: OrderEvent[];
   isDeleted?: boolean;
-  couponCode?: string;
+  couponCode?: string | undefined;
 };
 
 export type Coupon = {

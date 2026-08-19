@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { 
@@ -290,7 +291,7 @@ function Step({
 }: {
   done?: boolean;
   label: string;
-  hint: string;
+  hint: ReactNode;
   action?: React.ReactNode;
 }) {
   return (

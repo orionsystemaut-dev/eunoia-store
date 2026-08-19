@@ -106,11 +106,11 @@ function NfViewer() {
             <tr>
               <td className="w-[60%] border-r border-b border-black p-1 align-top">
                 <p className="uppercase font-bold text-[8px]">Nome/Razão Social</p>
-                <p className="text-xs">{order.customerName}</p>
+                <p className="text-xs">{order.customer}</p>
               </td>
               <td className="w-[25%] border-r border-b border-black p-1 align-top">
                 <p className="uppercase font-bold text-[8px]">CNPJ/CPF</p>
-                <p className="text-xs">{order.customerDoc ?? "000.000.000-00"}</p>
+                <p className="text-xs">{order.doc ?? "000.000.000-00"}</p>
               </td>
               <td className="w-[15%] border-b border-black p-1 align-top">
                 <p className="uppercase font-bold text-[8px]">Data de Emissão</p>
@@ -120,7 +120,7 @@ function NfViewer() {
             <tr>
               <td className="border-r border-b border-black p-1 align-top" colSpan={2}>
                 <p className="uppercase font-bold text-[8px]">Endereço</p>
-                <p className="text-xs">{order.customerAddress ?? "Endereço não informado"}</p>
+                <p className="text-xs">{order.address ?? "Endereço não informado"}</p>
               </td>
               <td className="border-b border-black p-1 align-top">
                 <p className="uppercase font-bold text-[8px]">Data Entrada/Saída</p>
@@ -206,17 +206,17 @@ function NfViewer() {
             </tr>
           </thead>
           <tbody>
-            {order.items.map((item, idx) => (
+            {(order.lines ?? []).map((item, idx) => (
               <tr key={idx}>
-                <td className="border border-black p-1 text-[10px]">{item.id.substring(0,6)}</td>
+                <td className="border border-black p-1 text-[10px]">{item.productId.substring(0,6)}</td>
                 <td className="border border-black p-1 text-left text-[10px]">{item.name} {item.variant}</td>
                 <td className="border border-black p-1 text-[10px]">00000000</td>
                 <td className="border border-black p-1 text-[10px]">0102</td>
                 <td className="border border-black p-1 text-[10px]">5102</td>
                 <td className="border border-black p-1 text-[10px]">UN</td>
-                <td className="border border-black p-1 text-[10px]">{item.quantity}</td>
+                <td className="border border-black p-1 text-[10px]">{item.qty}</td>
                 <td className="border border-black p-1 text-[10px]">{brl(item.price)}</td>
-                <td className="border border-black p-1 text-[10px]">{brl(item.price * item.quantity)}</td>
+                <td className="border border-black p-1 text-[10px]">{brl(item.price * item.qty)}</td>
               </tr>
             ))}
           </tbody>
@@ -228,7 +228,7 @@ function NfViewer() {
             <p className="uppercase font-bold text-[8px] mb-1">Informações Complementares</p>
             <p className="text-[10px]">
               Pedido #{order.id}<br/>
-              Pagamento: {order.paymentMethod.toUpperCase()}<br/>
+              Pagamento: {(order.payment ?? "—").toUpperCase()}<br/>
               DOCUMENTO SIMULADO - SEM VALIDADE FISCAL REAL.
             </p>
           </div>

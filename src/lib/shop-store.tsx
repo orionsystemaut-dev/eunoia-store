@@ -107,7 +107,7 @@ export type PlaceOrderInput = {
   shipping: number;
   discount: number;
   total: number;
-  couponCode?: string;
+  couponCode?: string | undefined;
 };
 
 export type RegisterInput = {
