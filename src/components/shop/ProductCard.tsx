@@ -10,7 +10,8 @@ export function ProductCard({ product }: { product: Product }) {
   const out = product.stock <= 0;
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-card)] transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]">
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card/80 backdrop-blur-sm shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(56,189,248,0.3)] dark:hover:shadow-[0_0_30px_rgba(56,189,248,0.5)] relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-cyan-400/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none z-10" />
       <Link
         to="/produto/$id"
         params={{ id: product.id }}

@@ -54,16 +54,24 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-            <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold tracking-tight">
+            <Link to="/" className="flex items-center gap-3 font-display text-2xl font-black tracking-tighter group">
               {siteConfig.logoUrl ? (
-                <img src={siteConfig.logoUrl} alt={siteConfig.storeName} className="h-8 w-auto object-contain" />
+                <img 
+                  src={siteConfig.logoUrl} 
+                  alt={siteConfig.storeName} 
+                  className="h-8 w-auto object-contain mix-blend-multiply dark:mix-blend-screen drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" 
+                />
               ) : (
                 <>
-                  <div className="grid h-8 w-8 place-items-center rounded-xl bg-brand text-sm text-primary-foreground">
-                    {siteConfig.storeName.charAt(0)}
+                  <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-400 text-white shadow-[0_0_20px_rgba(56,189,248,0.5)] transition-all duration-300 group-hover:shadow-[0_0_30px_rgba(56,189,248,0.8)]">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 relative z-10">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                      <polyline points="2 17 12 22 22 17" />
+                      <polyline points="2 12 12 17 22 12" />
+                    </svg>
                   </div>
-                  <span>
-                    {siteConfig.storeName}<span className="text-brand">.</span>
+                  <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent drop-shadow-sm">
+                    {siteConfig.storeName}
                   </span>
                 </>
               )}
