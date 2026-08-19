@@ -329,31 +329,40 @@ function Checkout() {
 
   return (
     <StoreShell>
-      <div className="mx-auto max-w-7xl px-4 py-8 lg:px-8">
-        <h1 className="font-display text-3xl font-bold">Finalizar compra</h1>
+      <div className="mx-auto max-w-4xl px-4 py-10 lg:px-8">
+        <div className="mb-10">
+          <h1 className="font-display text-3xl font-extrabold text-foreground drop-shadow-md">Finalizar Compra</h1>
+          <div className="mt-8 flex items-center justify-between relative">
+            {/* Progress line background */}
+            <div className="absolute top-1/2 left-0 w-full h-1 -translate-y-1/2 bg-border/50 rounded-full z-0"></div>
+            {/* Active progress line */}
+            <div 
+              className="absolute top-1/2 left-0 h-1 -translate-y-1/2 bg-cyan-400 rounded-full z-0 transition-all duration-500 shadow-[0_0_10px_rgba(56,189,248,0.8)]" 
+              style={{ width: `${(step / (STEPS.length - 1)) * 100}%` }}
+            ></div>
+            
+            {STEPS.map((s, i) => {
+              const active = i === step;
+              const passed = i < step;
+              return (
+                <div key={s} className="relative z-10 flex flex-col items-center gap-2">
+                  <div 
+                    className={`grid h-10 w-10 place-items-center rounded-full text-sm font-bold transition-all duration-300 ${
+                      active ? "bg-cyan-500 text-white shadow-[0_0_15px_rgba(56,189,248,0.8)] scale-110" :
+                      passed ? "bg-cyan-900 text-cyan-400 border border-cyan-500/50" :
+                      "bg-card border border-border/50 text-muted-foreground"
+                    }`}
+                  >
+                    {passed ? <Check className="h-5 w-5" /> : i + 1}
+                  </div>
+                  <span className={`text-xs font-semibold ${active ? "text-cyan-400" : passed ? "text-cyan-600" : "text-muted-foreground"}`}>{s}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
-        <ol className="mt-6 grid grid-cols-4 gap-2">
-          {STEPS.map((label, i) => (
-            <li key={label} className="min-w-0">
-              <div
-                className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-xs ${
-                  i === step
-                    ? "border-brand bg-brand/10 text-brand"
-                    : i < step
-                      ? "border-success/40 bg-success/10 text-success"
-                      : "border-border bg-card text-muted-foreground"
-                }`}
-              >
-                <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[10px] font-bold">
-                  {i < step ? <Check className="h-3 w-3" /> : i + 1}
-                </span>
-                <span className="truncate font-medium">{label}</span>
-              </div>
-            </li>
-          ))}
-        </ol>
-
-        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="grid gap-8 lg:grid-cols-[1fr_360px] items-start">
           <div className="space-y-6">
             {step === 0 && (
               <section className="rounded-2xl border border-border bg-card p-6">
@@ -402,8 +411,8 @@ function Checkout() {
             )}
 
             {step === 1 && (
-              <section className="rounded-2xl border border-border bg-card p-6">
-                <h2 className="font-display text-lg font-semibold">Dados de entrega</h2>
+              <section className="rounded-2xl border border-border/50 bg-card/80 backdrop-blur-md p-6 shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
+                <h2 className="font-display text-lg font-semibold text-foreground">Dados de entrega</h2>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <div>
                     <Label htmlFor="cep">CEP</Label>
@@ -418,48 +427,102 @@ function Checkout() {
                     <Input id="endereco" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Rua, número, complemento, cidade/UF" className="mt-1.5" />
                   </div>
                 </div>
+
+                <div className="mt-6 pt-6 border-t border-border/50">
+                  <h3 className="text-sm font-semibold mb-3">Opções de Frete (Integrações)</h3>
+                  <div className="space-y-3">
+                    <label className="flex cursor-pointer items-center justify-between rounded-xl border border-border/50 bg-background/50 p-4 transition-all hover:border-cyan-400/50 has-[:checked]:border-cyan-400 has-[:checked]:bg-cyan-900/20 has-[:checked]:shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+                      <div className="flex items-center gap-3">
+                        <input type="radio" name="frete" defaultChecked className="h-4 w-4 text-cyan-500 accent-cyan-500" />
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">Loggi Express</p>
+                          <p className="text-xs text-muted-foreground">Entrega em 1 a 2 dias úteis</p>
+                        </div>
+                      </div>
+                      <span className="font-bold text-success">{shippingCost === 0 ? "Grátis" : "R$ 15,90"}</span>
+                    </label>
+                    <label className="flex cursor-pointer items-center justify-between rounded-xl border border-border/50 bg-background/50 p-4 transition-all hover:border-cyan-400/50 has-[:checked]:border-cyan-400 has-[:checked]:bg-cyan-900/20 has-[:checked]:shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+                      <div className="flex items-center gap-3">
+                        <input type="radio" name="frete" className="h-4 w-4 text-cyan-500 accent-cyan-500" />
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">Correios Sedex</p>
+                          <p className="text-xs text-muted-foreground">Entrega em até 5 dias úteis</p>
+                        </div>
+                      </div>
+                      <span className="font-bold text-foreground">{shippingCost === 0 ? "R$ 9,90" : "R$ 24,90"}</span>
+                    </label>
+                  </div>
+                </div>
+
                 <div className="mt-5 flex gap-3">
                   <Button variant="outline" onClick={() => setStep(0)}>
                     Voltar
                   </Button>
                   <Button
-                    className="flex-1"
+                    className="flex-1 bg-cyan-500 text-white hover:bg-cyan-400 shadow-[0_0_15px_rgba(56,189,248,0.5)]"
                     onClick={() =>
                       cep && address ? setStep(2) : void toast.error("Informe CEP e endereço.")
                     }
                   >
-                    Continuar
+                    Continuar para Pagamento
                   </Button>
                 </div>
               </section>
             )}
 
             {step === 2 && (
-              <section className="rounded-2xl border border-border bg-card p-6">
-                <h2 className="font-display text-lg font-semibold">Pagamento</h2>
+              <section className="rounded-2xl border border-border/50 bg-card/80 backdrop-blur-md p-6 shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
+                <h2 className="font-display text-lg font-semibold text-foreground">Método de Pagamento</h2>
                 <RadioGroup value={payment} onValueChange={setPayment} className="mt-4 space-y-3">
                   {paymentConfig.pixEnabled && (
-                    <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border p-4 text-sm has-[:checked]:border-brand">
-                      <RadioGroupItem value="pix" id="pix" />
-                      Pix — 12% de desconto
+                    <label className="flex cursor-pointer items-center gap-4 rounded-xl border border-border/50 bg-background/50 p-4 transition-all hover:border-cyan-400/50 has-[:checked]:border-cyan-400 has-[:checked]:bg-cyan-900/20 has-[:checked]:shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+                      <RadioGroupItem value="pix" id="pix" className="text-cyan-500" />
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-foreground flex items-center gap-2">
+                          <QrCode className="h-4 w-4 text-emerald-400" /> Pix Instantâneo
+                        </p>
+                        <p className="text-xs text-emerald-500 font-medium">12% de desconto no valor total</p>
+                      </div>
                     </label>
                   )}
                   {paymentConfig.cardEnabled && (
-                    <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border p-4 text-sm has-[:checked]:border-brand">
-                      <RadioGroupItem value="cartao" id="cartao" />
-                      Cartão de crédito — até 10x sem juros
+                    <label className="flex cursor-pointer items-center gap-4 rounded-xl border border-border/50 bg-background/50 p-4 transition-all hover:border-cyan-400/50 has-[:checked]:border-cyan-400 has-[:checked]:bg-cyan-900/20 has-[:checked]:shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+                      <RadioGroupItem value="cartao" id="cartao" className="text-cyan-500" />
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-foreground flex items-center gap-2">
+                          <CreditCard className="h-4 w-4 text-cyan-400" /> Cartão de Crédito
+                        </p>
+                        <p className="text-xs text-muted-foreground">Em até 10x sem juros</p>
+                      </div>
                     </label>
                   )}
-                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border p-4 text-sm has-[:checked]:border-brand">
-                    <RadioGroupItem value="boleto" id="boleto" />
-                    Boleto bancário
+                  <label className="flex cursor-pointer items-center gap-4 rounded-xl border border-border/50 bg-background/50 p-4 transition-all hover:border-cyan-400/50 has-[:checked]:border-cyan-400 has-[:checked]:bg-cyan-900/20 has-[:checked]:shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+                    <RadioGroupItem value="boleto" id="boleto" className="text-cyan-500" />
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-foreground flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-muted-foreground" /> Boleto Bancário
+                      </p>
+                      <p className="text-xs text-muted-foreground">Vencimento em 3 dias úteis</p>
+                    </div>
                   </label>
                 </RadioGroup>
+                
+                {payment === "cartao" && (
+                  <div className="mt-4 p-4 rounded-xl bg-background/50 border border-border/50 space-y-3">
+                    <Input placeholder="Número do Cartão" />
+                    <div className="grid grid-cols-2 gap-3">
+                      <Input placeholder="MM/AA" />
+                      <Input placeholder="CVC" />
+                    </div>
+                    <Input placeholder="Nome impresso no cartão" />
+                  </div>
+                )}
+
                 <div className="mt-5 flex gap-3">
                   <Button variant="outline" onClick={() => setStep(1)}>
                     Voltar
                   </Button>
-                  <Button className="flex-1" onClick={() => setStep(3)}>
+                  <Button className="flex-1 bg-cyan-500 text-white hover:bg-cyan-400 shadow-[0_0_15px_rgba(56,189,248,0.5)]" onClick={() => setStep(3)}>
                     Revisar pedido
                   </Button>
                 </div>
