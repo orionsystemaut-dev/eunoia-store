@@ -7,8 +7,8 @@ import { brl } from "@/lib/shop-data";
 import { useShop } from "@/lib/shop-store";
 
 export function CartDrawer() {
-  const { cart, cartOpen, setCartOpen, cartTotal, updateQty, removeFromCart } = useShop();
-  const freeShipping = cartTotal >= 299;
+  const { cart, cartOpen, setCartOpen, cartTotal, updateQty, removeFromCart, shippingConfig } = useShop();
+  const freeShipping = cartTotal >= shippingConfig.freeShippingThreshold;
 
   return (
     <Sheet open={cartOpen} onOpenChange={setCartOpen}>
@@ -78,11 +78,11 @@ export function CartDrawer() {
             </div>
 
             <div className="space-y-3 border-t border-border px-5 py-4">
-              <p className="text-xs text-muted-foreground">
-                {freeShipping
-                  ? "🎉 Você ganhou frete grátis!"
-                  : `Faltam ${brl(299 - cartTotal)} para frete grátis`}
-              </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {freeShipping
+                    ? "Parabéns! Você ganhou frete grátis."
+                    : `Faltam ${brl(shippingConfig.freeShippingThreshold - cartTotal)} para frete grátis`}
+                </p>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Subtotal</span>
                 <span className="font-display text-xl font-bold">{brl(cartTotal)}</span>

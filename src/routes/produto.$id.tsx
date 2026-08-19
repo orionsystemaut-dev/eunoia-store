@@ -31,7 +31,7 @@ export const Route = createFileRoute("/produto/$id")({
 
 function ProductDetail() {
   const { id } = Route.useParams();
-  const { products, addToCart } = useShop();
+  const { products, addToCart, shippingConfig } = useShop();
   const product = products.find((p) => p.id === id);
 
   const [imgIndex, setImgIndex] = useState(0);
@@ -71,7 +71,7 @@ function ProductDetail() {
     }
     const base = (Number(digits.slice(-2)) % 30) + 9;
     setShipping([
-      { label: "Econômica", price: product.price >= 299 ? 0 : base, eta: "6 a 9 dias úteis" },
+      { label: "Econômica", price: product.price >= shippingConfig.freeShippingThreshold ? 0 : base, eta: "6 a 9 dias úteis" },
       { label: "Padrão", price: base + 12.9, eta: "3 a 5 dias úteis" },
       { label: "Expressa", price: base + 29.9, eta: "1 dia útil" },
     ]);

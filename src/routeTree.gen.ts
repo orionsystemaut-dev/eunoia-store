@@ -20,9 +20,11 @@ import { Route as AdminClientesRouteImport } from './routes/admin.clientes'
 import { Route as AdminCuponsRouteImport } from './routes/admin.cupons'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminEditorRouteImport } from './routes/admin.editor'
+import { Route as AdminFreteRouteImport } from './routes/admin.frete'
 import { Route as AdminPagamentosRouteImport } from './routes/admin.pagamentos'
 import { Route as AdminPedidosRouteImport } from './routes/admin.pedidos'
 import { Route as AdminProdutosRouteImport } from './routes/admin.produtos'
+import { Route as NfIdRouteImport } from './routes/nf.$id'
 import { Route as PedidoIdRouteImport } from './routes/pedido.$id'
 import { Route as ProdutoIdRouteImport } from './routes/produto.$id'
 import { Route as AdminPedidoIdRouteImport } from './routes/admin.pedido.$id'
@@ -82,6 +84,11 @@ const AdminEditorRoute = AdminEditorRouteImport.update({
   path: '/editor',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminFreteRoute = AdminFreteRouteImport.update({
+  id: '/frete',
+  path: '/frete',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPagamentosRoute = AdminPagamentosRouteImport.update({
   id: '/pagamentos',
   path: '/pagamentos',
@@ -96,6 +103,11 @@ const AdminProdutosRoute = AdminProdutosRouteImport.update({
   id: '/produtos',
   path: '/produtos',
   getParentRoute: () => AdminRoute,
+} as any)
+const NfIdRoute = NfIdRouteImport.update({
+  id: '/nf/$id',
+  path: '/nf/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PedidoIdRoute = PedidoIdRouteImport.update({
   id: '/pedido/$id',
@@ -124,9 +136,11 @@ export interface FileRoutesByFullPath {
   '/admin/cupons': typeof AdminCuponsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/editor': typeof AdminEditorRoute
+  '/admin/frete': typeof AdminFreteRoute
   '/admin/pagamentos': typeof AdminPagamentosRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/produtos': typeof AdminProdutosRoute
+  '/nf/$id': typeof NfIdRoute
   '/pedido/$id': typeof PedidoIdRoute
   '/produto/$id': typeof ProdutoIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -142,9 +156,11 @@ export interface FileRoutesByTo {
   '/admin/cupons': typeof AdminCuponsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/editor': typeof AdminEditorRoute
+  '/admin/frete': typeof AdminFreteRoute
   '/admin/pagamentos': typeof AdminPagamentosRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/produtos': typeof AdminProdutosRoute
+  '/nf/$id': typeof NfIdRoute
   '/pedido/$id': typeof PedidoIdRoute
   '/produto/$id': typeof ProdutoIdRoute
   '/admin': typeof AdminIndexRoute
@@ -162,9 +178,11 @@ export interface FileRoutesById {
   '/admin/cupons': typeof AdminCuponsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/editor': typeof AdminEditorRoute
+  '/admin/frete': typeof AdminFreteRoute
   '/admin/pagamentos': typeof AdminPagamentosRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/produtos': typeof AdminProdutosRoute
+  '/nf/$id': typeof NfIdRoute
   '/pedido/$id': typeof PedidoIdRoute
   '/produto/$id': typeof ProdutoIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -183,9 +201,11 @@ export interface FileRouteTypes {
     | '/admin/cupons'
     | '/admin/dashboard'
     | '/admin/editor'
+    | '/admin/frete'
     | '/admin/pagamentos'
     | '/admin/pedidos'
     | '/admin/produtos'
+    | '/nf/$id'
     | '/pedido/$id'
     | '/produto/$id'
     | '/admin/'
@@ -201,9 +221,11 @@ export interface FileRouteTypes {
     | '/admin/cupons'
     | '/admin/dashboard'
     | '/admin/editor'
+    | '/admin/frete'
     | '/admin/pagamentos'
     | '/admin/pedidos'
     | '/admin/produtos'
+    | '/nf/$id'
     | '/pedido/$id'
     | '/produto/$id'
     | '/admin'
@@ -220,9 +242,11 @@ export interface FileRouteTypes {
     | '/admin/cupons'
     | '/admin/dashboard'
     | '/admin/editor'
+    | '/admin/frete'
     | '/admin/pagamentos'
     | '/admin/pedidos'
     | '/admin/produtos'
+    | '/nf/$id'
     | '/pedido/$id'
     | '/produto/$id'
     | '/admin/'
@@ -236,6 +260,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   ContaRoute: typeof ContaRoute
   TermosRoute: typeof TermosRoute
+  NfIdRoute: typeof NfIdRoute
   PedidoIdRoute: typeof PedidoIdRoute
   ProdutoIdRoute: typeof ProdutoIdRoute
 }
@@ -319,6 +344,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEditorRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/frete': {
+      id: '/admin/frete'
+      path: '/frete'
+      fullPath: '/admin/frete'
+      preLoaderRoute: typeof AdminFreteRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/pagamentos': {
       id: '/admin/pagamentos'
       path: '/pagamentos'
@@ -339,6 +371,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/produtos'
       preLoaderRoute: typeof AdminProdutosRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/nf/$id': {
+      id: '/nf/$id'
+      path: '/nf/$id'
+      fullPath: '/nf/$id'
+      preLoaderRoute: typeof NfIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/pedido/$id': {
       id: '/pedido/$id'
@@ -369,6 +408,7 @@ interface AdminRouteChildren {
   AdminCuponsRoute: typeof AdminCuponsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminEditorRoute: typeof AdminEditorRoute
+  AdminFreteRoute: typeof AdminFreteRoute
   AdminPagamentosRoute: typeof AdminPagamentosRoute
   AdminPedidosRoute: typeof AdminPedidosRoute
   AdminProdutosRoute: typeof AdminProdutosRoute
@@ -381,6 +421,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCuponsRoute: AdminCuponsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminEditorRoute: AdminEditorRoute,
+  AdminFreteRoute: AdminFreteRoute,
   AdminPagamentosRoute: AdminPagamentosRoute,
   AdminPedidosRoute: AdminPedidosRoute,
   AdminProdutosRoute: AdminProdutosRoute,
@@ -397,6 +438,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   ContaRoute: ContaRoute,
   TermosRoute: TermosRoute,
+  NfIdRoute: NfIdRoute,
   PedidoIdRoute: PedidoIdRoute,
   ProdutoIdRoute: ProdutoIdRoute,
 }
