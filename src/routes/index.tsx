@@ -42,8 +42,7 @@ function Home() {
           playsInline
           className="absolute inset-0 h-full w-full object-cover opacity-60"
         >
-          <source src="https://assets.mixkit.co/videos/preview/mixkit-set-of-three-smartphones-in-a-dark-room-41838-large.mp4" type="video/mp4" />
-          <source src="https://cdn.coverr.co/videos/coverr-a-person-typing-on-a-macbook-5034/1080p.mp4" type="video/mp4" />
+          <source src="/showcase.mp4" type="video/mp4" />
         </video>
 
         {/* Gradient Overlay for better readability */}
