@@ -25,6 +25,7 @@ function AdminPagamentos() {
   
   const [pixEnabled, setPixEnabled] = useState(paymentConfig.pixEnabled);
   const [pixKey, setPixKey] = useState(paymentConfig.pixKey);
+  const [pixDiscount, setPixDiscount] = useState(paymentConfig.pixDiscount ?? 0);
   
   const [cardEnabled, setCardEnabled] = useState(paymentConfig.cardEnabled);
   const [gatewayKey, setGatewayKey] = useState(paymentConfig.gatewayKey);
@@ -33,6 +34,7 @@ function AdminPagamentos() {
     updatePaymentConfig({
       pixEnabled,
       pixKey,
+      pixDiscount,
       cardEnabled,
       gatewayKey,
     });
@@ -56,10 +58,20 @@ function AdminPagamentos() {
             <Switch checked={pixEnabled} onCheckedChange={setPixEnabled} />
           </div>
           {pixEnabled && (
-            <div className="mt-5 space-y-3 border-t border-border pt-5">
+            <div className="mt-5 grid grid-cols-2 gap-4 border-t border-border pt-5">
               <div className="space-y-1">
                 <Label>Chave PIX</Label>
                 <Input value={pixKey} onChange={e => setPixKey(e.target.value)} />
+              </div>
+              <div className="space-y-1">
+                <Label>Desconto PIX (%)</Label>
+                <Input 
+                  type="number" 
+                  min="0" 
+                  max="100" 
+                  value={pixDiscount} 
+                  onChange={e => setPixDiscount(Number(e.target.value) || 0)} 
+                />
               </div>
             </div>
           )}

@@ -70,7 +70,7 @@ function Checkout() {
 
   const shipping = cartTotal >= shippingConfig.freeShippingThreshold || cartTotal === 0 ? 0 : shippingConfig.fixedRate;
   
-  const pixDiscount = payment === "pix" ? cartTotal * 0.12 : 0;
+  const pixDiscount = payment === "pix" && paymentConfig.pixDiscount ? cartTotal * (paymentConfig.pixDiscount / 100) : 0;
   
   let couponDiscount = 0;
   if (appliedCoupon) {
@@ -439,7 +439,7 @@ function Checkout() {
                           <p className="text-xs text-muted-foreground">Entrega em 1 a 2 dias úteis</p>
                         </div>
                       </div>
-                      <span className="font-bold text-success">{shippingCost === 0 ? "Grátis" : "R$ 15,90"}</span>
+                      <span className="font-bold text-success">{shipping === 0 ? "Grátis" : "R$ 15,90"}</span>
                     </label>
                     <label className="flex cursor-pointer items-center justify-between rounded-xl border border-border/50 bg-background/50 p-4 transition-all hover:border-cyan-400/50 has-[:checked]:border-cyan-400 has-[:checked]:bg-cyan-900/20 has-[:checked]:shadow-[0_0_15px_rgba(56,189,248,0.2)]">
                       <div className="flex items-center gap-3">
@@ -449,7 +449,7 @@ function Checkout() {
                           <p className="text-xs text-muted-foreground">Entrega em até 5 dias úteis</p>
                         </div>
                       </div>
-                      <span className="font-bold text-foreground">{shippingCost === 0 ? "R$ 9,90" : "R$ 24,90"}</span>
+                      <span className="font-bold text-foreground">{shipping === 0 ? "Grátis" : "R$ 24,90"}</span>
                     </label>
                   </div>
                 </div>
@@ -481,7 +481,9 @@ function Checkout() {
                         <p className="text-sm font-bold text-foreground flex items-center gap-2">
                           <QrCode className="h-4 w-4 text-emerald-400" /> Pix Instantâneo
                         </p>
-                        <p className="text-xs text-emerald-500 font-medium">12% de desconto no valor total</p>
+                        {paymentConfig.pixDiscount > 0 && (
+                          <p className="text-xs text-emerald-500 font-medium">{paymentConfig.pixDiscount}% de desconto no valor total</p>
+                        )}
                       </div>
                     </label>
                   )}
@@ -597,7 +599,7 @@ function Checkout() {
               <div className="pt-2 space-y-2">
                 <Row label="Subtotal" value={brl(cartTotal)} />
                 <Row label="Frete" value={shipping === 0 ? "Grátis" : brl(shipping)} />
-                {pixDiscount > 0 && <Row label="Desconto Pix (12%)" value={`- ${brl(pixDiscount)}`} />}
+                {pixDiscount > 0 && <Row label={`Desconto Pix (${paymentConfig.pixDiscount}%)`} value={`- ${brl(pixDiscount)}`} />}
                 {appliedCoupon && <Row label={`Cupom (${appliedCoupon.code})`} value={`- ${brl(couponDiscount)}`} />}
                 <div className="flex items-center justify-between pt-2 font-display text-lg font-bold">
                   <span>Total</span>

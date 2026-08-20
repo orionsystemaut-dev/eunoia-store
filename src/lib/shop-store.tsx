@@ -39,6 +39,7 @@ export type PerkConfig = {
 export type PaymentConfig = {
   pixEnabled: boolean;
   pixKey: string;
+  pixDiscount: number;
   cardEnabled: boolean;
   gatewayKey: string;
 };
@@ -123,6 +124,7 @@ export type RegisterInput = {
 const DEFAULT_PAYMENT_CONFIG: PaymentConfig = {
   pixEnabled: true,
   pixKey: "CNPJ 12.345.678/0001-90",
+  pixDiscount: 12,
   cardEnabled: true,
   gatewayKey: "pk_test_12345",
 };
