@@ -1,16 +1,7 @@
-import p1 from "@/assets/p1.jpg";
-import p2 from "@/assets/p2.jpg";
-import p3 from "@/assets/p3.jpg";
 import type { Coupon, Invoice, Order, OrderEvent, OrderLine, OrderStatus, Product } from "./shop-data";
 
-const SEED_IMAGES: Record<string, string> = {
-  "/assets/p1.jpg": p1,
-  "/assets/p2.jpg": p2,
-  "/assets/p3.jpg": p3,
-};
-
 export const resolveImage = (src?: string | null) =>
-  (src && (SEED_IMAGES[src] ?? src)) || p1;
+  src || "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?q=80&w=800&auto=format&fit=crop";
 
 const num = (v: unknown, fallback = 0) => (v === null || v === undefined ? fallback : Number(v));
 

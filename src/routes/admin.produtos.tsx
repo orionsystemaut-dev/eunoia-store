@@ -145,52 +145,16 @@ function AdminProducts() {
   };
 
   const restoreDemoProducts = async () => {
-    const demo = [
-      {
-        id: `prod-${Date.now()}-1`,
-        name: "iPhone 17 Pro Max 512GB Titânio Espacial",
-        description: "O mais novo lançamento da Apple com chip A19 Pro, corpo em titânio e sistema de câmeras revoluncionário.",
-        price: 11499.00,
-        oldPrice: 13999.00,
-        image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=800&auto=format&fit=crop",
-        gallery: ["https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=800&auto=format&fit=crop"],
-        category: "smartphones",
-        stock: 12,
-        rating: 5.0,
-        isNew: true,
-      },
-      {
-        id: `prod-${Date.now()}-2`,
-        name: "MacBook Pro M3 Max 16 polegadas 1TB",
-        description: "O notebook mais poderoso para profissionais criativos, agora com a geração M3 Max.",
-        price: 24999.00,
-        oldPrice: 0,
-        image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=800&auto=format&fit=crop",
-        gallery: ["https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=800&auto=format&fit=crop"],
-        category: "notebooks",
-        stock: 5,
-        rating: 4.9,
-        isNew: false,
-      },
-      {
-        id: `prod-${Date.now()}-3`,
-        name: "Apple Watch Ultra 2 Titânio",
-        description: "O relógio definitivo para esportes radicais, com a tela mais brilhante já feita pela Apple.",
-        price: 6499.00,
-        oldPrice: 7299.00,
-        image: "https://images.unsplash.com/photo-1617043786539-204122d25081?q=80&w=800&auto=format&fit=crop",
-        gallery: ["https://images.unsplash.com/photo-1617043786539-204122d25081?q=80&w=800&auto=format&fit=crop"],
-        category: "smartwatches",
-        stock: 8,
-        rating: 4.8,
-        isNew: true,
-      }
-    ];
-
-    for (const p of demo) {
-      await saveProduct(p as Product);
+    // Delete existing
+    for (const p of products) {
+      await deleteProduct(p.id);
     }
-    toast.success("Produtos de demonstração restaurados!");
+    // Import SEED_PRODUCTS
+    const { SEED_PRODUCTS } = await import("@/lib/shop-data");
+    for (const p of SEED_PRODUCTS) {
+      await saveProduct(p);
+    }
+    toast.success("Catálogo premium restaurado com sucesso!");
   };
 
   return (
