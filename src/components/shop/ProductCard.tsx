@@ -1,16 +1,26 @@
 import { Link } from "@tanstack/react-router";
 import { Star } from "lucide-react";
+import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { brl, type Product } from "@/lib/shop-data";
 import { useShop } from "@/lib/shop-store";
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, index = 0 }: { product: Product, index?: number }) {
   const { addToCart } = useShop();
   const out = product.stock <= 0;
+  
+  const isPremium = product.price > 5000 || product.featured;
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card/80 backdrop-blur-sm shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(56,189,248,0.3)] dark:hover:shadow-[0_0_30px_rgba(56,189,248,0.5)] relative">
+    <motion.article 
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
+      className={`group flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card/80 backdrop-blur-sm shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(56,189,248,0.3)] dark:hover:shadow-[0_0_30px_rgba(56,189,248,0.5)] relative ${isPremium ? 'glow-border-wrap' : ''}`}
+    >
+      <div className={isPremium ? 'glow-border-content h-full flex flex-col' : 'h-full flex flex-col'}>
       <div className="absolute inset-0 bg-gradient-to-b from-cyan-400/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none z-10" />
       <Link
         to="/produto/$id"
@@ -74,6 +84,7 @@ export function ProductCard({ product }: { product: Product }) {
           {out ? "Indisponível" : "Adicionar"}
         </Button>
       </div>
-    </article>
+      </div>
+    </motion.article>
   );
 }

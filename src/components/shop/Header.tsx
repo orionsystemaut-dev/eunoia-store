@@ -122,25 +122,51 @@ export function Header() {
         </div>
       </div>
 
-      <nav className="hidden border-t border-border/60 lg:block">
-        <div className="mx-auto flex max-w-7xl items-center gap-6 px-8 py-2.5 text-sm">
+      <nav className="hidden border-t border-border/60 lg:block relative z-50">
+        <div className="mx-auto flex max-w-7xl items-center gap-6 px-8 text-sm">
           <Link
             to="/catalogo"
             search={{ q: "", categoria: "todas", ordem: "relevancia" }}
-            className="font-medium text-muted-foreground transition-colors hover:text-brand"
+            className="font-medium text-muted-foreground transition-colors hover:text-brand py-3"
           >
             Todos os produtos
           </Link>
-          {categories.map((c) => (
-            <Link
-              key={c.slug}
-              to="/catalogo"
-              search={{ q: "", categoria: c.slug, ordem: "relevancia" }}
-              className="text-muted-foreground transition-colors hover:text-brand"
-            >
-              {c.name}
-            </Link>
-          ))}
+          
+          <div className="group relative py-3 cursor-pointer">
+            <span className="text-muted-foreground transition-colors group-hover:text-cyan-400 font-medium">Categorias</span>
+            
+            {/* Mega Menu Dropdown */}
+            <div className="absolute top-full left-0 mt-0 w-[500px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-4 group-hover:translate-y-0">
+              <div className="absolute -top-4 left-0 w-full h-6 bg-transparent" /> {/* Invisible hover bridge */}
+              <div className="rounded-2xl border border-white/10 bg-black/60 backdrop-blur-2xl p-6 shadow-2xl overflow-hidden relative">
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl"></div>
+                <div className="relative z-10 grid grid-cols-2 gap-4">
+                  {categories.map((c) => (
+                    <Link
+                      key={c.slug}
+                      to="/catalogo"
+                      search={{ q: "", categoria: c.slug, ordem: "relevancia" }}
+                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors group/item"
+                    >
+                      <div className="grid h-10 w-10 place-items-center rounded-lg bg-white/5 text-lg group-hover/item:bg-cyan-500/20 group-hover/item:text-cyan-400 transition-colors">
+                        {c.emoji}
+                      </div>
+                      <span className="font-semibold text-gray-200 group-hover/item:text-white">{c.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <Link
+            to="/catalogo"
+            search={{ q: "", categoria: "todas", ordem: "relevancia" }}
+            className="text-muted-foreground transition-colors hover:text-brand py-3"
+          >
+            Ofertas
+          </Link>
+          
           <span className="ml-auto text-xs font-medium text-brand">
             {siteConfig.promoBar}
           </span>

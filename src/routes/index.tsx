@@ -76,6 +76,31 @@ function Home() {
         </div>
       </section>
 
+      {/* Brand Marquee */}
+      <section className="border-b border-border bg-card/50 py-8 overflow-hidden">
+        <div className="flex w-full overflow-hidden">
+          <div className="animate-marquee flex min-w-full items-center justify-around gap-16 px-16 whitespace-nowrap">
+            <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">SAMSUNG</span>
+            <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">APPLE</span>
+            <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">DJI</span>
+            <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">JBL</span>
+            <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">SONY</span>
+            <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">LOGITECH</span>
+            <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">GARMIN</span>
+          </div>
+          {/* Duplicate for seamless looping */}
+          <div className="animate-marquee flex min-w-full items-center justify-around gap-16 px-16 whitespace-nowrap" aria-hidden="true">
+            <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">SAMSUNG</span>
+            <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">APPLE</span>
+            <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">DJI</span>
+            <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">JBL</span>
+            <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">SONY</span>
+            <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">LOGITECH</span>
+            <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">GARMIN</span>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto grid max-w-7xl gap-4 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
         {siteConfig.perks.map((p, i) => {
           const Icon = [Truck, RefreshCcw, BadgePercent, Headphones][i];
@@ -155,8 +180,8 @@ function Section({
         </Link>
       </div>
       <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {items.map((p) => (
-          <ProductCard key={p.id} product={p} />
+        {items.map((p, i) => (
+          <ProductCard key={p.id} product={p} index={i} />
         ))}
       </div>
     </section>
