@@ -79,7 +79,7 @@ function Home() {
       {/* Brand Marquee */}
       <section className="border-b border-border bg-card/50 py-8 overflow-hidden">
         <div className="flex w-full overflow-hidden">
-          <div className="animate-marquee flex min-w-full items-center justify-around gap-16 px-16 whitespace-nowrap">
+          <div className="animate-marquee flex min-w-full shrink-0 items-center justify-around gap-16 px-16 whitespace-nowrap">
             <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">SAMSUNG</span>
             <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">APPLE</span>
             <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">DJI</span>
@@ -89,7 +89,7 @@ function Home() {
             <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">GARMIN</span>
           </div>
           {/* Duplicate for seamless looping */}
-          <div className="animate-marquee flex min-w-full items-center justify-around gap-16 px-16 whitespace-nowrap" aria-hidden="true">
+          <div className="animate-marquee flex min-w-full shrink-0 items-center justify-around gap-16 px-16 whitespace-nowrap" aria-hidden="true">
             <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">SAMSUNG</span>
             <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">APPLE</span>
             <span className="text-2xl font-bold font-display text-muted-foreground opacity-50 hover:opacity-100 transition-opacity">DJI</span>
