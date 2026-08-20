@@ -20,11 +20,11 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-xl">
-      <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3 sm:gap-5 lg:px-8">
-        <div className="flex min-w-0 items-center gap-2">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 lg:px-8">
+        <div className="flex items-center gap-4">
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Abrir menu">
+              <Button variant="ghost" size="icon" className="lg:hidden shrink-0" aria-label="Abrir menu">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
@@ -54,7 +54,7 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-            <Link to="/" className="flex items-center gap-3 font-display text-2xl font-black tracking-tighter group">
+            <Link to="/" className="flex items-center gap-3 font-display text-2xl md:text-3xl font-black tracking-[0.1em] group uppercase">
               {siteConfig.logoUrl ? (
                 <img 
                   src={siteConfig.logoUrl} 
@@ -62,32 +62,25 @@ export function Header() {
                   className="h-8 w-auto object-contain mix-blend-multiply dark:mix-blend-screen drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" 
                 />
               ) : (
-                <>
-                  <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-400 text-white shadow-[0_0_20px_rgba(56,189,248,0.5)] transition-all duration-300 group-hover:shadow-[0_0_30px_rgba(56,189,248,0.8)]">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 relative z-10">
-                      <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                      <polyline points="2 17 12 22 22 17" />
-                      <polyline points="2 12 12 17 22 12" />
-                    </svg>
-                  </div>
-                  <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent drop-shadow-sm">
-                    {siteConfig.storeName}
-                  </span>
-                </>
+                <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-gray-100 to-gray-400 group-hover:from-white group-hover:to-gray-300 transition-all duration-500" style={{ textShadow: '0 0 20px rgba(56, 189, 248, 0.4), 0 0 40px rgba(56, 189, 248, 0.2)' }}>
+                  {siteConfig.storeName}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/0 via-cyan-400/20 to-cyan-500/0 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 rounded-full" />
+                </span>
               )}
             </Link>
         </div>
 
-        <form onSubmit={submit} className="relative hidden min-w-0 md:block">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Buscar produtos, marcas e categorias"
-            className="h-11 rounded-full border-border bg-secondary pl-10"
-            aria-label="Buscar produtos"
-          />
-        </form>
+        <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
+          <form onSubmit={submit} className="relative hidden md:block w-48 lg:w-64 transition-all focus-within:w-64 lg:focus-within:w-80">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-cyan-400" />
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Buscar..."
+              className="h-10 rounded-full border-border/50 bg-secondary/50 backdrop-blur-sm pl-10 hover:border-cyan-400/30 focus-visible:border-cyan-400/50 focus-visible:ring-1 focus-visible:ring-cyan-400/50 transition-all"
+              aria-label="Buscar produtos"
+            />
+          </form>
 
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <Link to="/conta">
@@ -119,6 +112,7 @@ export function Header() {
               </span>
             )}
           </Button>
+        </div>
         </div>
       </div>
 
