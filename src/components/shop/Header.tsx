@@ -116,7 +116,7 @@ export function Header() {
       </div>
 
       <nav className="hidden border-t border-border/60 lg:block relative z-50">
-        <div className="mx-auto flex max-w-7xl items-center justify-center gap-12 px-8 text-sm">
+        <div className="mx-auto flex max-w-7xl items-center justify-center gap-12 px-8 text-sm relative">
           <Link
             to="/catalogo"
             search={{ q: "", categoria: "todas", ordem: "relevancia" }}
@@ -131,7 +131,7 @@ export function Header() {
             {/* Mega Menu Dropdown */}
             <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 w-[500px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-4 group-hover:translate-y-0">
               <div className="absolute -top-4 left-0 w-full h-6 bg-transparent" /> {/* Invisible hover bridge */}
-              <div className="rounded-2xl border border-white/10 bg-black/60 backdrop-blur-2xl p-6 shadow-2xl overflow-hidden relative">
+              <div className="rounded-2xl border border-white/5 bg-zinc-950/95 backdrop-blur-3xl p-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden relative">
                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl"></div>
                 <div className="relative z-10 grid grid-cols-2 gap-4">
                   {categories.map((c) => (
@@ -139,7 +139,7 @@ export function Header() {
                       key={c.slug}
                       to="/catalogo"
                       search={{ q: "", categoria: c.slug, ordem: "relevancia" }}
-                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors group/item"
+                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/10 transition-colors group/item"
                     >
                       <div className="grid h-10 w-10 place-items-center rounded-lg bg-white/5 text-lg group-hover/item:bg-cyan-500/20 group-hover/item:text-cyan-400 transition-colors">
                         {c.emoji}
@@ -160,7 +160,7 @@ export function Header() {
             Ofertas
           </Link>
           
-          <span className="ml-auto text-xs font-medium text-brand">
+          <span className="absolute right-8 text-xs font-medium text-brand">
             {siteConfig.promoBar}
           </span>
         </div>
