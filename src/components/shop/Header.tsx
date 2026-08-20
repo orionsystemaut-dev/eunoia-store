@@ -20,7 +20,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 lg:px-8">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 lg:px-8 relative">
         <div className="flex items-center gap-4">
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
@@ -54,7 +54,7 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-            <Link to="/" className="flex items-center gap-3 font-display text-2xl md:text-3xl font-black tracking-[0.1em] group uppercase">
+            <Link to="/" className="flex items-center gap-3 font-display text-3xl font-medium tracking-wide group">
               {siteConfig.logoUrl ? (
                 <img 
                   src={siteConfig.logoUrl} 
@@ -62,25 +62,25 @@ export function Header() {
                   className="h-8 w-auto object-contain mix-blend-multiply dark:mix-blend-screen drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" 
                 />
               ) : (
-                <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-gray-100 to-gray-400 group-hover:from-white group-hover:to-gray-300 transition-all duration-500" style={{ textShadow: '0 0 20px rgba(56, 189, 248, 0.4), 0 0 40px rgba(56, 189, 248, 0.2)' }}>
-                  {siteConfig.storeName}
-                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/0 via-cyan-400/20 to-cyan-500/0 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 rounded-full" />
+                <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-500 group-hover:from-white group-hover:to-gray-300 transition-all duration-500" style={{ textShadow: '0 0 15px rgba(56, 189, 248, 0.5), 0 0 30px rgba(56, 189, 248, 0.3)' }}>
+                  Órion
+                  <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500/0 via-cyan-400/30 to-cyan-500/0 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10 rounded-full" />
                 </span>
               )}
             </Link>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
-          <form onSubmit={submit} className="relative hidden md:block w-48 lg:w-64 transition-all focus-within:w-64 lg:focus-within:w-80">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-cyan-400" />
-            <Input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Buscar..."
-              className="h-10 rounded-full border-border/50 bg-secondary/50 backdrop-blur-sm pl-10 hover:border-cyan-400/30 focus-visible:border-cyan-400/50 focus-visible:ring-1 focus-visible:ring-cyan-400/50 transition-all"
-              aria-label="Buscar produtos"
-            />
-          </form>
+        {/* Centered Search Bar */}
+        <form onSubmit={submit} className="absolute left-1/2 -translate-x-1/2 hidden md:block w-72 lg:w-[28rem] transition-all focus-within:w-80 lg:focus-within:w-[32rem]">
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-cyan-400" />
+          <Input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Buscar..."
+            className="h-11 rounded-full border-border/50 bg-secondary/50 backdrop-blur-sm pl-12 pr-4 hover:border-cyan-400/40 focus-visible:border-cyan-400/60 focus-visible:ring-1 focus-visible:ring-cyan-400/50 transition-all text-sm"
+            aria-label="Buscar produtos"
+          />
+        </form>
 
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <Link to="/conta">
@@ -113,11 +113,10 @@ export function Header() {
             )}
           </Button>
         </div>
-        </div>
       </div>
 
       <nav className="hidden border-t border-border/60 lg:block relative z-50">
-        <div className="mx-auto flex max-w-7xl items-center gap-6 px-8 text-sm">
+        <div className="mx-auto flex max-w-7xl items-center justify-center gap-12 px-8 text-sm">
           <Link
             to="/catalogo"
             search={{ q: "", categoria: "todas", ordem: "relevancia" }}
@@ -130,7 +129,7 @@ export function Header() {
             <span className="text-muted-foreground transition-colors group-hover:text-cyan-400 font-medium">Categorias</span>
             
             {/* Mega Menu Dropdown */}
-            <div className="absolute top-full left-0 mt-0 w-[500px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-4 group-hover:translate-y-0">
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 w-[500px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-4 group-hover:translate-y-0">
               <div className="absolute -top-4 left-0 w-full h-6 bg-transparent" /> {/* Invisible hover bridge */}
               <div className="rounded-2xl border border-white/10 bg-black/60 backdrop-blur-2xl p-6 shadow-2xl overflow-hidden relative">
                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl"></div>
