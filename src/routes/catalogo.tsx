@@ -48,7 +48,7 @@ function Catalog() {
   const { products, categories } = useShop();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
-  const [maxPrice, setMaxPrice] = useState(2000);
+  const [maxPrice, setMaxPrice] = useState(15000);
   const [term, setTerm] = useState(search.q);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -134,9 +134,9 @@ function Catalog() {
                 className="mt-5"
                 value={[maxPrice]}
                 min={100}
-                max={2000}
-                step={50}
-                onValueChange={(v) => setMaxPrice(v[0] ?? 2000)}
+                max={15000}
+                step={500}
+                onValueChange={(v) => setMaxPrice(v[0] ?? 15000)}
               />
               <p className="mt-3 text-sm text-muted-foreground">até {brl(maxPrice)}</p>
             </div>
