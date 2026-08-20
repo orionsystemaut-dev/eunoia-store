@@ -131,8 +131,8 @@ export function Header() {
             {/* Mega Menu Dropdown */}
             <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 w-[500px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-4 group-hover:translate-y-0">
               <div className="absolute -top-4 left-0 w-full h-6 bg-transparent" /> {/* Invisible hover bridge */}
-              <div className="rounded-2xl border border-white/5 bg-zinc-950/95 backdrop-blur-3xl p-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden relative">
-                <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl"></div>
+              <div className="rounded-2xl border border-white/10 bg-black/95 backdrop-blur-3xl p-6 shadow-[0_30px_80px_-15px_rgba(0,0,0,1)] overflow-hidden relative">
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl"></div>
                 <div className="relative z-10 grid grid-cols-2 gap-4">
                   {categories.map((c) => (
                     <Link
