@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Menu, Search, ShoppingBag, UserRound } from "lucide-react";
+import { Menu, Search, ShoppingBag, UserRound, Flame } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -72,7 +72,12 @@ export function Header() {
 
         {/* Centered Search Bar */}
         <form onSubmit={submit} className="absolute left-1/2 -translate-x-1/2 hidden md:block w-72 lg:w-[28rem] transition-all focus-within:w-80 lg:focus-within:w-[32rem]">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-cyan-400" />
+          <div className="pointer-events-none absolute left-4 top-1/2 flex -translate-y-1/2 items-center justify-center">
+            {/* The base Search icon acts as the core of the fire */}
+            <Search className="absolute h-5 w-5 animate-flame text-cyan-400 opacity-90 transition-opacity group-focus-within:opacity-100" />
+            {/* An extra inner flame to give it shape and heat */}
+            <Flame className="absolute -top-1 h-3 w-3 animate-flame text-sky-300 opacity-80 mix-blend-screen" style={{ animationDelay: "200ms", filter: "blur(0.5px)" }} />
+          </div>
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
