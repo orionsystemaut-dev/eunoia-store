@@ -257,8 +257,17 @@
   }
 }
 
+@keyframes fire-dance {
+  0% { transform: scale(1) translateY(0) skewX(0deg); }
+  25% { transform: scale(1.05) translateY(-1px) skewX(2deg); }
+  50% { transform: scale(0.95) translateY(1px) skewX(-2deg); }
+  75% { transform: scale(1.1) translateY(-2px) skewX(1deg); }
+  100% { transform: scale(1) translateY(0) skewX(0deg); }
+}
+
 .fire-static {
-  animation: fire-glow 1.5s infinite alternate ease-in-out;
+  animation: fire-glow 1.5s infinite alternate ease-in-out, fire-dance 1s infinite alternate ease-in-out;
+  transform-origin: bottom center;
 }
 
 
