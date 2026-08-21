@@ -72,11 +72,21 @@ export function Header() {
 
         {/* Centered Search Bar */}
         <form onSubmit={submit} className="absolute left-1/2 -translate-x-1/2 hidden md:block w-72 lg:w-[28rem] transition-all focus-within:w-80 lg:focus-within:w-[32rem]">
-          <div className="pointer-events-none absolute left-4 top-1/2 flex -translate-y-1/2 items-center justify-center">
-            {/* The base Search icon acts as the core of the fire */}
-            <Search className="absolute h-5 w-5 fire-static text-cyan-300" />
-            {/* An extra inner flame to give it shape and heat */}
-            <Flame className="absolute -top-1 h-3 w-3 fire-static mix-blend-overlay text-white" style={{ animationDelay: "200ms", filter: "blur(0.5px)" }} />
+          <div className="pointer-events-none absolute left-3 top-1/2 flex -translate-y-1/2 items-center justify-center w-8 h-8">
+            <svg width="0" height="0" className="absolute">
+              <filter id="fire-warp" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05 0.15" numOctaves="2" result="noise">
+                  <animate attributeName="baseFrequency" values="0.05 0.15; 0.08 0.25; 0.05 0.15" dur="1s" repeatCount="indefinite" />
+                  <animate attributeName="seed" from="1" to="100" dur="10s" repeatCount="indefinite" />
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center -translate-y-0.5 scale-[1.3] opacity-80 mix-blend-screen" style={{ filter: "url(#fire-warp)" }}>
+              <Flame className="w-5 h-5 text-cyan-500 drop-shadow-[0_0_4px_rgba(6,182,212,1)]" strokeWidth={0} fill="currentColor" />
+              <Flame className="absolute w-3 h-3 text-sky-200 drop-shadow-[0_0_8px_rgba(14,165,233,1)]" strokeWidth={0} fill="currentColor" />
+            </div>
+            <Search className="relative z-10 h-4 w-4 text-white drop-shadow-[0_0_3px_rgba(0,0,0,0.8)]" strokeWidth={2.5} />
           </div>
           <Input
             value={q}
