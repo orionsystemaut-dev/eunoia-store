@@ -72,12 +72,7 @@ export function Header() {
 
         {/* Centered Search Bar */}
         <form onSubmit={submit} className="absolute left-1/2 -translate-x-1/2 hidden md:block w-72 lg:w-[28rem] transition-all focus-within:w-80 lg:focus-within:w-[32rem]">
-          <div className="pointer-events-none absolute left-4 top-1/2 flex -translate-y-1/2 items-center justify-center">
-            {/* Clean, sharp fire glow behind */}
-            <Flame className="absolute -top-1 h-5 w-5 fire-static text-cyan-400" strokeWidth={2.5} />
-            {/* The base Search icon on top */}
-            <Search className="relative z-10 h-4 w-4 text-white drop-shadow-md" strokeWidth={3} />
-          </div>
+          <Search className="pointer-events-none absolute left-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-white/90 transition-colors group-focus-within:text-cyan-400" strokeWidth={2.5} />
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}

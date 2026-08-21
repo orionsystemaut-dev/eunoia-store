@@ -238,25 +238,6 @@
   animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes fire-glow {
-  0% {
-    filter: drop-shadow(0 -3px 8px #0ea5e9) drop-shadow(0 0 15px #0284c7) drop-shadow(0 0 30px #38bdf8);
-    color: #38bdf8;
-  }
-  33% {
-    filter: drop-shadow(0 -6px 12px #22d3ee) drop-shadow(0 0 20px #06b6d4) drop-shadow(0 0 45px #22d3ee);
-    color: #ffffff;
-  }
-  66% {
-    filter: drop-shadow(0 -2px 6px #0ea5e9) drop-shadow(0 0 12px #0284c7) drop-shadow(0 0 25px #0284c7);
-    color: #22d3ee;
-  }
-  100% {
-    filter: drop-shadow(0 -4px 10px #38bdf8) drop-shadow(0 0 25px #0ea5e9) drop-shadow(0 0 35px #38bdf8);
-    color: #7dd3fc;
-  }
-}
-
 @keyframes fire-dance {
   0% { transform: scale(1) translateY(0) skewX(0deg); }
   25% { transform: scale(1.05) translateY(-1px) skewX(2deg); }
@@ -266,7 +247,7 @@
 }
 
 .fire-static {
-  animation: fire-glow 1.5s infinite alternate ease-in-out, fire-dance 1s infinite alternate ease-in-out;
+  animation: fire-dance 1s infinite alternate ease-in-out;
   transform-origin: bottom center;
 }
 
