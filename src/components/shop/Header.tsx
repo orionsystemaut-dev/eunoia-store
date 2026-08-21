@@ -74,9 +74,9 @@ export function Header() {
         <form onSubmit={submit} className="absolute left-1/2 -translate-x-1/2 hidden md:block w-72 lg:w-[28rem] transition-all focus-within:w-80 lg:focus-within:w-[32rem]">
           <div className="pointer-events-none absolute left-4 top-1/2 flex -translate-y-1/2 items-center justify-center">
             {/* The base Search icon acts as the core of the fire */}
-            <Search className="absolute h-5 w-5 animate-flame text-cyan-400 opacity-90 transition-opacity group-focus-within:opacity-100" />
+            <Search className="absolute h-5 w-5 fire-static text-cyan-300" />
             {/* An extra inner flame to give it shape and heat */}
-            <Flame className="absolute -top-1 h-3 w-3 animate-flame text-sky-300 opacity-80 mix-blend-screen" style={{ animationDelay: "200ms", filter: "blur(0.5px)" }} />
+            <Flame className="absolute -top-1 h-3 w-3 fire-static mix-blend-overlay text-white" style={{ animationDelay: "200ms", filter: "blur(0.5px)" }} />
           </div>
           <Input
             value={q}
